@@ -3,6 +3,7 @@
 # import modules
 import sys
 import os
+import random
 from time import sleep
 
 xss = "================================\n" \
@@ -41,7 +42,7 @@ x = "===========\n" \
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
 
-def show(): 
+def show(arg): 
     RED   = '\033[0;31;40m'
     BLUE  = '\033[0;36;40m'
     BOLD  = '\033[1m'
@@ -57,8 +58,47 @@ def show():
     print RED + xss + ENDC
     sleep(0.5)
     
+    if (len(arg) > 1 ) and (arg[1] == '-q') :
+      print get_quote()
+
     print (BLUE + 'Welcome to my terminal, type ' + ENDC 
          + BOLD + 'help' + ENDC + BLUE + ' to see commands' + ENDC + '\n')
 
+def get_quote():
+   
+  quotes = ["\"Jerry, just remember... It's not a lie if you believe it\""\
+            "\n   -- George Costanza",
+            
+            "\"You know, if you take everything I've accomplished in my"\
+            " entire life and condense it down into one day, it looks"\
+            " decent.\"\n   -- George Costanza",
+            
+            "\"You're giving me the 'It's not you, it's me routine?' I"\
+            " invented 'It's not you, it's me.' Nobody tells me it's them"\
+            ", not me. If it's anybody, it's me\"\n   -- George Costanza",
+            
+            "\"You have the chicken, the hen, and the rooster. The chicken"\
+            " goes with the hen... So who is having sex with the rooster?\""\
+            "\n   -- Frank Costanza",
+            
+            "\"I don't think I've ever been to an appointment in my life"\
+            " where I wanted the other guy to show up.\"\n   -- George Costanza",
+            
+            "\"Don't insult me, my friend. Remember who you're talking to."\
+            " No one's a bigger idiot than me.\"\n   -- George Costanza",
+
+            "\"I'm not superstitious, but I am a little stitious.\"\n -- "\
+            "Michael Scott"
+
+
+            ]
+
+  return quotes[random.randint(0, len(quotes)-1)] + '\n'
+  
+
+
+
+
 if __name__ == '__main__':
     show()
+    get_quote()

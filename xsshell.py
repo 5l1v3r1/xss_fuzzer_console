@@ -13,12 +13,15 @@ class color:
     BOLD  = '\033[1m'
     LINE  = '\033[4m'
 
+# 
+
 # Command line prompt
-cmd = color.BLUE + "[XSS]" + color.ENDC + color.BOLD + "> " + color.ENDC
+cmd = color.BLUE + "[" + color.ENDC + "XSS" + color.BLUE + "]" + color.ENDC \
+    + color.BOLD + "> " + color.ENDC
 
 # Gather our code in a main() function
-def main():
-  intro.show()
+def main(arg):
+  intro.show(arg)
   while 1 :
     try:
       input = raw_input(cmd)
@@ -37,11 +40,19 @@ def eval(input):
     print 'See ya!'
     sys.exit(0)
 
+
 def print_help():
+  _ = '   '
   print '\n=== ' + color.YELLW + 'Commands' + color.ENDC + ' ==='
-  print '   ' + color.YELLW + 'help' + color.ENDC + '   print this message'
-  print '   ' + color.YELLW + 'exit' + color.ENDC + '   exit this terminal'
+  print _ + color.YELLW + 'help' + color.ENDC + '     print this message.'
+  print _ + color.YELLW + 'exit' + color.ENDC + '     exit this terminal.'
+  print _ + color.YELLW + 'status' + color.ENDC + '   show status of ' \
+                              ' current and finished jobs. '
+  print _ + color.YELLW + 'info' + color.ENDC + color.GREEN + ' job_name' \
+              + color.ENDC + '   show info about a job.'
+  print _ + color.YELLW + 'target' + color.ENDC + color.GREEN + ' url' \
+              + color.ENDC + '   set the target url for xss analysis.'
   print '================\n'
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
