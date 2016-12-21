@@ -44,10 +44,8 @@ def cls():
 def show(): 
     RED   = '\033[0;31;40m'
     BLUE  = '\033[0;36;40m'
-    GREEN = '\033[0;32;40m'
-    ENDC  = '\033[0m'
     BOLD  = '\033[1m'
-    LINE  = '\033[4m'
+    ENDC  = '\033[0m'
     
     cls()
     print RED + x + ENDC
