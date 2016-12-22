@@ -48,6 +48,9 @@ def show(arg):
     BOLD  = '\033[1m'
     ENDC  = '\033[0m'
     
+    if (len(arg) > 1 ) and (arg[1] == '-x') :
+      return
+
     cls()
     print RED + x + ENDC
     sleep(0.5)
