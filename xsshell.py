@@ -56,6 +56,10 @@ def eval(input):
     elif args[0] == 'spider':
         print 'spidey'
 
+    elif args[0] == 'status':
+        print color('Target: ', 'RED') + targetStr
+       
+
 def print_help():
     _ = '   '
     print '\n=== ' + color('Commands','YELLW') + ' ==='
