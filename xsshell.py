@@ -53,6 +53,7 @@ def eval(input):
             else :
                 global targetStr
                 targetStr = url
+                print targetStr
     elif args[0] == 'spider':
         print 'spidey'
 

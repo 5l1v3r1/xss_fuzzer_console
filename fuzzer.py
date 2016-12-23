@@ -6,7 +6,41 @@ import urllib2
 from HTMLParser import HTMLParser
 
 class MyHTMLParser(HTMLParser):
-    # Consider extending parser class to store variables, or take in new parameters
+    links = {}
+    base_url = ""
+    base_path = ""
+
+    @staticmethod
+    def is_absolute(url) :
+        new_url = ""
+        tok = url.split("//")
+        if tok[0] == "https:" or tok[0] == "http:":
+            new_url = ''.join(tok[1:])
+            return True
+        else :
+            return False
+   
+    @staticmethod
+    def remove_path(url) :
+        new_url = ""
+        path = ""
+        tok = url.split("//")
+        if tok[0] == "https:" or tok[0] == "http:":
+            new_url = ''.join(tok[1:])
+        
+        path_tok = new_url.split('/')
+        new_url = '//'.join((tok[0], path_tok[0]))
+        
+        if len(path_tok) > 1 :
+            path = '/' + '/'.join(path_tok[1:])
+
+        return (new_url, path)
+
+    def set_target(self, url) :
+        ret = self.remove_path(url)
+        self.base_url = ret[0]
+        self.base_path = ret[1]
+
     def handle_starttag(self, tag, attrs):
       valid = False    # is url valid
       relative = True # is link relative url addressing
@@ -18,42 +52,29 @@ class MyHTMLParser(HTMLParser):
           if name == "href":
             value = value.encode('ascii', 'ignore')
             base  = value # Copy of value that will be modified
-
-            # Begin initial truncation 
-            tok = value.split("//")
-
-            # Removing http or https
-            if tok[0] == "https:" or tok[0] == "http:":
-              base = ''.join(tok[1:])
-              relative = False
-
-            # Removing www.
-            #tok = value.split("www.")
-            #if len(tok) > 1:
-            #  base = tok[1]
-            #  relative = False
             
+
+            # If link changed, then address is absolute
+            if self.is_absolute(base) : relative = False
+ 
             # Extrapolate base url to determine if url is in scope
             if not relative :
-              value = base # setting to full path
-              base = base.split("/")[0] # removing path to compare
-              if base == url :
+              base = self.remove_path(base)[0]
+              if base == self.base_url :
                 valid = True
-            # Relative Adressing -- There are two types
+            
             # If address begins with '/' it's relative to base url
             # Otherwise address is relative to base + path url
             else :
               valid = True # Relative will usually be valid
               if value[0] != '/':
-                value = baseUrl + basePath + value
+                value = self.base_url + self.base_path + value
               else :
-                value = baseUrl + value
+                value = self.base_url + value
               
-            print value
-
-baseUrl  = "" 
-basePath = ""
-
+            if valid:
+                self.links.update({value : 0})
+                
 # Set attack target. Make connection to ensure valid target
 def set_target(request) : 
     connfd = None
@@ -71,20 +92,18 @@ def set_target(request) :
         ret = 'Invalid Target -- Make sure the complete URL is provided'
     return ret
 
+def get_links(url) :
+    r = urllib2.urlopen(url)
+    data = r.read()
+    parser = MyHTMLParser()
+    parser.set_target(url)
+    parser.feed(data)
+    parser.close()
+    return parser.links
+
 # Gather our code in a main() function
 def main(url, path):
-    r = urllib2.urlopen(url + path)
-    global baseUrl, basePath
-    baseUrl = url
-    basePath = path
-    conn = httplib.HTTPSConnection(url)
-    conn.request("GET", path)
-    rsp = conn.getresponse()
-    print rsp.status, rsp.reason
-    data = rsp.read()
-    parser = MyHTMLParser()
-    parser.feed(data)
-    conn.close()
+    get_links(url + path)
 
 if __name__ == '__main__':
     url = 'https://resources.allsetlearning.com' 
