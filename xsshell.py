@@ -4,6 +4,8 @@
 import sys
 import intro
 import fuzzer
+import threading
+import fuzz_thread
 
 col_d = {
     'RED'  :'\033[0;31;40m',
@@ -15,6 +17,7 @@ col_d = {
     'LINE' :'\033[4m'}
 
 targetStr = ''
+thread_cnt = 1
 
 # Gather our code in a main() function
 def main(arg):
@@ -55,7 +58,19 @@ def eval(input):
                 targetStr = url
                 print targetStr
     elif args[0] == 'spider':
-        print 'spidey'
+        global thread_cnt # Number of threads to spider with
+        try :
+            thread_i = args.index("-threads") + 1
+            if thread_i < len(args) :
+                thread_cnt = int(args[thread_i])
+        except ValueError:
+            print 'No threads argument. Default threads: ' + str(thread_cnt) 
+        queue = fuzz_thread.DictQueue({targetStr : thread_cnt})
+        for i in range(thread_cnt) :
+            th = threading.Thread(name='spider_thread'+str(i), 
+                           target=fuzz_thread.spider_thread, args=(queue,))
+            th.daemon = True
+            th.start()
 
     elif args[0] == 'status':
         print color('Target: ', 'RED') + targetStr
@@ -72,6 +87,9 @@ def print_help():
             + '   show info about a job.'
     print _ + color('target', 'YELLW') + color(' url', 'GREEN') \
             + '   set the target url for xss analysis.'
+    print _ + color('spider', 'YELLW') + color(' delay', 'GREEN') \
+            + color(' threads', 'GREEN') + color(' depth', 'GREEN')    \
+            + '   extract all the links from the target'
     print '================\n'
 
 

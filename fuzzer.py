@@ -3,74 +3,50 @@
 # import modules
 import httplib
 import urllib2
+from urlparse import urlparse
 from HTMLParser import HTMLParser
 
 class MyHTMLParser(HTMLParser):
     links = {}
+    scheme = "" # url scheme such as http or https
     base_url = ""
     base_path = ""
-
-    @staticmethod
-    def is_absolute(url) :
-        new_url = ""
-        tok = url.split("//")
-        if tok[0] == "https:" or tok[0] == "http:":
-            new_url = ''.join(tok[1:])
-            return True
-        else :
-            return False
-   
-    @staticmethod
-    def remove_path(url) :
-        new_url = ""
-        path = ""
-        tok = url.split("//")
-        if tok[0] == "https:" or tok[0] == "http:":
-            new_url = ''.join(tok[1:])
-        
-        path_tok = new_url.split('/')
-        new_url = '//'.join((tok[0], path_tok[0]))
-        
-        if len(path_tok) > 1 :
-            path = '/' + '/'.join(path_tok[1:])
-
-        return (new_url, path)
-
+    
     def set_target(self, url) :
-        ret = self.remove_path(url)
-        self.base_url = ret[0]
-        self.base_path = ret[1]
+        # Parsing target url with urlparse library
+        o = urlparse(url)
+        self.scheme = o.scheme
+        self.base_url   =  o.netloc 
+        self.base_path  = o.path   
 
     def handle_starttag(self, tag, attrs):
       valid = False    # is url valid
-      relative = True # is link relative url addressing
+      relative = False # is link relative url addressing
      
       # If tag is a link
       if tag == "a":
         for name, value in attrs:
           # Webpage link
           if name == "href":
-            value = value.encode('ascii', 'ignore')
-            base  = value # Copy of value that will be modified
+            #//value = value.encode('ascii', 'ignore')
             
+            o = urlparse(value)
+            if o.netloc == '' : 
+                relative = True # default is False
 
-            # If link changed, then address is absolute
-            if self.is_absolute(base) : relative = False
- 
-            # Extrapolate base url to determine if url is in scope
+            # Check if absolute URL is in scope
             if not relative :
-              base = self.remove_path(base)[0]
-              if base == self.base_url :
-                valid = True
-            
+                if o.netloc == self.base_url :
+                    valid = True
             # If address begins with '/' it's relative to base url
             # Otherwise address is relative to base + path url
             else :
-              valid = True # Relative will usually be valid
-              if value[0] != '/':
-                value = self.base_url + self.base_path + value
-              else :
-                value = self.base_url + value
+                valid = True # Relative will usually be valid
+                if value[0] != '/':
+                    value = (self.scheme + '://' + self.base_url + 
+                             self.base_path + value)
+                else :
+                    value = self.scheme + '://' +  self.base_url + value
               
             if valid:
                 self.links.update({value : 0})
@@ -93,8 +69,11 @@ def set_target(request) :
     return ret
 
 def get_links(url) :
-    r = urllib2.urlopen(url)
-    data = r.read()
+
+    conn = urllib2.urlopen(url)
+    encoding = conn.headers.getparam('charset')
+    data = conn.read().decode(encoding)
+
     parser = MyHTMLParser()
     parser.set_target(url)
     parser.feed(data)
