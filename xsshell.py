@@ -50,7 +50,7 @@ def eval(input):
 
         else :
             url = args[1]
-            resp = fuzzer.set_target(url)
+            resp = fuzzer.set_target(url)[1]
             if resp != 'Success' :
                 print color(resp + '\n', 'RED') + usage
             else :

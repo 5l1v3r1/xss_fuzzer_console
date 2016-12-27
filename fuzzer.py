@@ -11,7 +11,8 @@ class MyHTMLParser(HTMLParser):
     scheme = "" # url scheme such as http or https
     base_url = ""
     base_path = ""
-    
+    depth = 0
+
     def set_target(self, url) :
         # Parsing target url with urlparse library
         o = urlparse(url)
@@ -49,15 +50,14 @@ class MyHTMLParser(HTMLParser):
                     value = self.scheme + '://' +  self.base_url + value
               
             if valid:
-                self.links.update({value : 0})
+                self.links.update({value : self.depth})
                 
 # Set attack target. Make connection to ensure valid target
-def set_target(request) : 
+def set_target(request): 
     connfd = None
     ret = 'Success'
     try:
         connfd = urllib2.urlopen(request)
-        connfd.close()
     except urllib2.HTTPError, e:
         ret = 'HTTPError: ' + str(e.code)
     except urllib2.URLError, e:
@@ -66,15 +66,28 @@ def set_target(request) :
         ret = 'HTTPException'
     except Exception:
         ret = 'Invalid Target -- Make sure the complete URL is provided'
-    return ret
+    return connfd, ret
 
-def get_links(url) :
+def scrape_links(url, depth):
+    target = set_target(url)
+    conn = target[0]
+    result = target[1]
 
-    conn = urllib2.urlopen(url)
+    if result != 'Success':
+        return None
+
     encoding = conn.headers.getparam('charset')
-    data = conn.read().decode(encoding)
+    content = conn.info().type 
+    if content == 'text/plain':
+        return None
+
+    data = conn.read()
+    
+    if encoding != None:
+        data = data.decode(encoding)
 
     parser = MyHTMLParser()
+    parser.depth = depth
     parser.set_target(url)
     parser.feed(data)
     parser.close()
@@ -82,7 +95,7 @@ def get_links(url) :
 
 # Gather our code in a main() function
 def main(url, path):
-    get_links(url + path)
+    scrape_links(url + path)
 
 if __name__ == '__main__':
     url = 'https://resources.allsetlearning.com' 
