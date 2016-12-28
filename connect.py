@@ -87,7 +87,7 @@ def scrape_links(url, depth):
         data = data.decode(encoding)
 
     parser = MyHTMLParser()
-    parser.depth = depth
+    parser.depth = depth - 1
     parser.set_target(url)
     parser.feed(data)
     parser.close()

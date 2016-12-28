@@ -3,7 +3,7 @@
 # import modules
 import sys
 import intro
-import fuzzer
+import connect
 import threading
 import fuzz_thread
 
@@ -14,12 +14,30 @@ col_d = {
     'YELLW':'\033[33m',
     'ENDC' :'\033[0m',
     'BOLD' :'\033[1m',
-    'LINE' :'\033[4m'}
+    'LINE' :'\033[4m'
+    }
 
-targetStr = ''
-thread_cnt = 1
+config = {
+        '-target': '', # Target URL, which defines the initial scope
+        '-threads': 1, # Number of threads for spider and attacker
+        '-delay': 0,   # Delay in network requests
+        '-depth': 3    # Recursive depth when using spider
+        }
 
-# Gather our code in a main() function
+class usage:
+    set = '' 
+    def __init__(self):
+        self.set = 'usage: ' + color('set', 'YELLW') + color('  [-target URL]'
+            + '  [-threads n]  [-delay n]  [-depth n]', 'GREEN') + '\n'\
+           'Options: \n' \
+           '  -target URL: attack target URL; defines initial scope\n'\
+           '  -threads n:  number of threads of execution for attack\n'\
+           '  -delay n:    delay, in milliseconds, between network requests\n'\
+           '  -depth n:    recursive depth when running spider\n'
+
+
+queue = None # global object containing spidered links and other metadata 
+
 def main(arg):
     # Command line prompt
     cmd = color('[','BLUE') + 'XSS' + color(']','BLUE') + color('> ', 'BOLD')
@@ -33,7 +51,10 @@ def main(arg):
             break
 
 def eval(input):
-    args = input.split()
+    # Declaring setup variables
+    global config
+    use = usage()
+    args = input.split() # Split arguments into a list
   
     if args[0] in ['h','-h','help','-help']:
         print_help()
@@ -41,55 +62,75 @@ def eval(input):
     elif args[0] in ['exit','-exit']:
         print 'See ya!'
         sys.exit(0)
+    elif args[0] == 'set':
+        if len(args) < 2:
+            print use.set
+            return
+        for op in args[1:]:
+            val_i = args.index(op) + 1
+            if (config.get(op) == None) or (val_i >= len(args)):
+                continue
 
-    elif args[0] == 'target' :
-        usage = "Usage: target url [-s] \n" \
-                "Options: \n\t-s \tSave target"
-        if len(args) < 2 :
-            print color('Not enough args. \n', 'RED') + usage
+            # If setting target, check that URL is valid
+            if op == '-target':
+                url = args[val_i]
+                res = connect.set_target(url)[1]
+                if res == 'Success' :
+                    config['-target'] = url
+            else:
+                try:
+                    config[op] = int(args[val_i])
+                except ValueError:
+                    print color('Invalid value for argument: ', 'RED') + op
+                    print use.set
 
-        else :
-            url = args[1]
-            resp = fuzzer.set_target(url)[1]
-            if resp != 'Success' :
-                print color(resp + '\n', 'RED') + usage
-            else :
-                global targetStr
-                targetStr = url
-                print targetStr
     elif args[0] == 'spider':
-        global thread_cnt # Number of threads to spider with
-        try :
-            thread_i = args.index("-threads") + 1
-            if thread_i < len(args) :
-                thread_cnt = int(args[thread_i])
-        except ValueError:
-            print 'No threads argument. Default threads: ' + str(thread_cnt) 
-        queue = fuzz_thread.DictQueue({targetStr : thread_cnt})
-        for i in range(thread_cnt) :
-            th = threading.Thread(name='spider_thread'+str(i), 
-                           target=fuzz_thread.spider_thread, args=(queue,))
-            th.daemon = True
-            th.start()
+        if len(args) < 2:
+            ######## print use.set
+            return
+        global queue
+        if args[1] == 'start':
+            # Initializing new attack queue structure
+            queue = fuzz_thread.DictQueue({config.get('-target')
+                                          :config.get('-depth')})
+            queue.delay = config['-delay'] / 1000.0 # millisec to sec
+            # Creating 'n' asynchronous threads
+            for i in range(config.get('-threads')):
+                th = threading.Thread(name='spider_thread'+str(i), 
+                     target=fuzz_thread.spider_thread, args=(queue,))
+                th.daemon = True
+                th.start()
+        elif args[1] == 'stop':
+            queue.spider_continue = False
+        else:
+            pass
+            #####
 
     elif args[0] == 'status':
-        print color('Target: ', 'RED') + targetStr
+        print '\n=== ' + color('Spider settings','YELLW') + ' ==='
+        print color('Target:  ', 'RED') + config.get('-target')
+        print color('Threads: ', 'RED') + str(config.get('-threads'))
+        print color('Depth:   ', 'RED') + str(config.get('-depth'))
+        print color('Delay:   ', 'RED') + str(config.get('-delay'))
+        if queue != None:
+            print (color('Links Visited: ', 'BLUE') + 
+            str(len(queue.visited_links)))
+        print '=======================\n'
+
        
 
 def print_help():
     _ = '   '
     print '\n=== ' + color('Commands','YELLW') + ' ==='
-    print _ + color('help','YELLW') + '     print this message.'
-    print _ + color('exit','YELLW') + '     exit this terminal.'
-    print _ + color('status','YELLW') + '   show status of ' \
-                                ' current and finished jobs. '
+    print _ + color('help','YELLW') + ' - print this message.'
+    print _ + color('exit','YELLW') + ' - exit this terminal.'
+    print _ + color('status','YELLW') + ' - show config values and ' \
+              'status of jobs. '
     print _ + color('info','YELLW') + color(' job_name', 'GREEN') \
-            + '   show info about a job.'
-    print _ + color('target', 'YELLW') + color(' url', 'GREEN') \
-            + '   set the target url for xss analysis.'
-    print _ + color('spider', 'YELLW') + color(' delay', 'GREEN') \
-            + color(' threads', 'GREEN') + color(' depth', 'GREEN')    \
-            + '   extract all the links from the target'
+            + ' - show info about a job.'
+    print _ + color('set', 'YELLW') + ' - set certain configuration values.'
+    print _ + color('spider', 'YELLW') \
+            + ' - extract all the links from the target'
     print '================\n'
 
 

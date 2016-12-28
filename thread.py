@@ -3,10 +3,9 @@
 # import modules
 import threading
 import collections
-import connect 
+import fuzzer 
 import copy
 import time
-import sys
 
 FIFO = False # Constant for OrderedDict
 
@@ -15,8 +14,7 @@ FIFO = False # Constant for OrderedDict
 
 # Synchronized Ordered Dictionary that serves as a queue
 class DictQueue:
-    spider_continue = True
-    delay = 0 
+    delay = .100
     queue_size = 0
     cv = threading.Condition()
     timer_lock = threading.Lock()
@@ -47,7 +45,7 @@ class DictQueue:
         # upload links
         for key, depth in links.items():
             # Reference visited links
-            if depth == -1: # If recursive limit is reached
+            if depth == 0: # If recursive limit is reached
                 continue
 
             # Avoid repeats if at same or lower depth 
@@ -70,12 +68,12 @@ class DictQueue:
             self.timer_lock.release()
         
         # Time of connection is not included in the delay
-        return connect.scrape_links(link[0], link[1])
+        return fuzzer.scrape_links(link[0], link[1])
 
 def spider_thread(queue):
-    while queue.spider_continue:
+    while 1:
         link = queue.get_link()
-        #print '\nURL: ' + link[0] + 'D: ' + str(link[1]) + ' LEN: ' + str(len(queue.dict_queue))
+        print 'URL: ' + link[0] + '   LEN: ' + str(len(queue.dict_queue))
         
         link_dict = queue.delay_conn(link)
         if link_dict != None:
