@@ -8,6 +8,7 @@ import threading
 import collections
 import connect 
 import time
+import util
 import sys
 
 # Class containing Attack URLs with their associated metadata
@@ -99,18 +100,25 @@ class DictQueue:
         # Time of connection is not included in the delay
         return connect.scrape_links(link[0], link[1])
 
+# Function executed by spider threads
 def spider_thread(queue):
     while queue.spider_continue:
+        # Retrieve URL and make connection
         link = queue.get_link()
-        #print '\nURL: ' + link[0] + 'D: ' + str(link[1]) + ' LEN: ' + str(len(queue.dict_queue))
         response = queue.delay_conn(link)
+
         if response == None: continue
         link_dict = response[0]
         data = response[1]
        
         # Storing data in attack object if visited parameterized url
         param_obj = queue.param_links.get(link[0]) 
-        if param_obj != None:   param_obj.data = data
+        if param_obj != None:   
+            param_obj.data = data
+            gen = util.string_match(data, param_obj.cookie)
+            print gen
+            for i in gen:
+                print data[i-20:i+20]
 
         # Adding discovered links to queue
         queue.add_links(link_dict)
