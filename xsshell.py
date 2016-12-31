@@ -55,13 +55,15 @@ def eval(input):
     global config
     use = usage()
     args = input.split() # Split arguments into a list
-  
+
+    # Command to print out help message
     if args[0] in ['h','-h','help','-help']:
         print_help()
-  
+    # Command to exit attacker
     elif args[0] in ['exit','-exit']:
         print 'See ya!'
         sys.exit(0)
+    # Command used to set configuration variables
     elif args[0] == 'set':
         if len(args) < 2:
             print use.set
@@ -83,7 +85,7 @@ def eval(input):
                 except ValueError:
                     print color('Invalid value for argument: ', 'RED') + op
                     print use.set
-
+    # Command to execute spider threads to crawl a link
     elif args[0] == 'spider':
         if len(args) < 2:
             ######## print use.set
@@ -104,8 +106,8 @@ def eval(input):
             queue.spider_continue = False
         else:
             pass
-            #####
-
+            # TODO make usage statement for spider #
+    # Command to print out status of current config values 
     elif args[0] == 'status':
         print '\n=== ' + color('Spider settings','YELLW') + ' ==='
         print color('Target:  ', 'RED') + config.get('-target')
@@ -113,8 +115,12 @@ def eval(input):
         print color('Depth:   ', 'RED') + str(config.get('-depth'))
         print color('Delay:   ', 'RED') + str(config.get('-delay'))
         if queue != None:
-            print (color('Links Visited: ', 'BLUE') + 
-            str(len(queue.visited_links)))
+            print (color('Links Visited: ', 'BLUE')  
+                    + str(len(queue.visited_links)))
+            print (color('Links Found:   ', 'BLUE')  
+                    + str(len(queue.dict_queue)))
+            print (color('Parameterized Links: ', 'BLUE')
+                    + str(len(queue.param_links)))
         print '=======================\n'
 
        

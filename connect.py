@@ -21,36 +21,36 @@ class MyHTMLParser(HTMLParser):
         self.base_path  = o.path   
 
     def handle_starttag(self, tag, attrs):
-      valid = False    # is url valid
-      relative = False # is link relative url addressing
+        valid = False    # is url valid
+        relative = False # is link relative url addressing
      
-      # If tag is a link
-      if tag == "a":
-        for name, value in attrs:
-          # Webpage link
-          if name == "href":
-            #//value = value.encode('ascii', 'ignore')
-            
-            o = urlparse(value)
-            if o.netloc == '' : 
-                relative = True # default is False
+        # If tag is a link
+        if tag == "a":
+            for name, value in attrs:
+                # Webpage link
+                if name == "href":
+                    if value == '':
+                        continue  
+                    o = urlparse(value)
+                    if o.netloc == '': 
+                        relative = True # default is False
 
-            # Check if absolute URL is in scope
-            if not relative :
-                if o.netloc == self.base_url :
-                    valid = True
-            # If address begins with '/' it's relative to base url
-            # Otherwise address is relative to base + path url
-            else :
-                valid = True # Relative will usually be valid
-                if value[0] != '/':
-                    value = (self.scheme + '://' + self.base_url + 
-                             self.base_path + value)
-                else :
-                    value = self.scheme + '://' +  self.base_url + value
-              
-            if valid:
-                self.links.update({value : self.depth})
+                    # Check if absolute URL is in scope
+                    if not relative:
+                        if o.netloc == self.base_url:
+                            valid = True
+                    # If address begins with '/' it's relative to base url
+                    # Otherwise address is relative to base + path url
+                    else:
+                        valid = True # Relative will usually be valid
+                        if value[0] != '/':
+                            value = (self.scheme + '://' + self.base_url 
+                                  + self.base_path + value)
+                        else:
+                            value = (self.scheme + '://' +  self.base_url 
+                                  + value)
+                    if valid:
+                        self.links.update({value : self.depth})
                 
 # Set attack target. Make connection to ensure valid target
 def set_target(request): 
@@ -68,6 +68,7 @@ def set_target(request):
         ret = 'Invalid Target -- Make sure the complete URL is provided'
     return connfd, ret
 
+# Find all of the links in the connection response for a given url
 def scrape_links(url, depth):
     target = set_target(url)
     conn = target[0]
@@ -75,23 +76,27 @@ def scrape_links(url, depth):
 
     if result != 'Success':
         return None
-
+    
+    # Don't want to parse a plaintext file
     encoding = conn.headers.getparam('charset')
     content = conn.info().type 
     if content == 'text/plain':
         return None
-
+    #TODO Consider handling different content types 
+    # Retrieve connection response
     data = conn.read()
     
+    # Decode if necessary
     if encoding != None:
         data = data.decode(encoding)
-
+    
+    # Parse html response
     parser = MyHTMLParser()
     parser.depth = depth - 1
     parser.set_target(url)
     parser.feed(data)
     parser.close()
-    return parser.links
+    return (parser.links, data) # links in the data + the data itself 
 
 # Gather our code in a main() function
 def main(url, path):
