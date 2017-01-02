@@ -10,14 +10,76 @@ import connect
 import time
 import util
 import sys
+import re
+
+# Class containing necessary metadata for each attack vector
+class AttackContext:
+    # Context essentially refers to the attack location 
+    cookie = ''        # Inserted cookie to find
+    data = ''          # Raw HTML
+    tag = ''           # Direct Parent Tag
+    tag_closed = False # Has the open parent tag been closed
+    is_js = False      # In a javascript context
+    in_value = True    # Has iteration passed the assignment
+    delimiter = ''     # Is the input encapsulated by ' or "
+
+    # Initialize class variables and parse current context
+    def __init__(self, data, cookie, pos):
+        self.data = data
+        self.cookie = cookie
+        d = 0
+        for i in reversed(data[0:pos]):
+            d += 1
+            
+            if i == '>': # Parent tag is closed
+                self.tag_closed = True
+            
+            elif i == '<': # Look complete, because tag found
+                self.set_tag(pos-d+1, pos)
+                break
+            
+            elif i == '{': # JavaScript context
+                self.is_js = True
+
+            elif i == '=': # Value assignment complete
+                self.in_value = False
+
+            # Checking value delimiter
+            elif i == '\'' or i == '\"' and self.in_value:
+                self.delimiter = i
+
+    # Set the Parent tag for the current context
+    def set_tag(self, start, end):
+        # Split using space as delimiter
+        no_space = self.data[start:end].split(' ')
+        tag = no_space[0]
+        
+        # If tag is closed, make sure closing tag isn't included
+        if self.tag_closed:
+            tag = tag.split('>')[0]
+
+        self.tag = tag # Tag set
 
 # Class containing Attack URLs with their associated metadata
 class AttackURL:
-    cookie = binascii.b2a_hex(os.urandom(3)) # Generate cookie
+    cookie = str(binascii.b2a_hex(os.urandom(3))) # Generate cookie
     url = ''
+    data = '' # html data
+    atk_vectors = list() # attack vectors -- list of AttackContext's
 
     def __init__(self, url):
         self.url = url
+
+    def init_context(self):
+        if self.data == '':
+            return
+        else:
+            pass # Retrieve data
+
+        # Find all cookie reflections in the HTML
+        match = util.string_match(self.data, self.cookie)
+        for pos in match:
+            context = AttackContext(self.data, self.cookie, pos)
 
     # Generates an attack object for parameterized URLs
     @staticmethod
@@ -74,8 +136,9 @@ class DictQueue:
             parse = urlparse(url)
             params = parse_qs(parse.query.encode('utf-8')) 
             if params: # If params, create attack object
-                attack_obj = AttackURL.create(parse, params)
-                url = attack_obj.url
+                # Create Attack Object
+                attack_obj = AttackURL.create(parse, params) 
+                url = attack_obj.url # Retreive attack url
                 self.param_links.update({url: attack_obj})
             
             # Avoid repeats if at same or lower depth 
@@ -115,11 +178,7 @@ def spider_thread(queue):
         param_obj = queue.param_links.get(link[0]) 
         if param_obj != None:   
             param_obj.data = data
-            gen = util.string_match(data, param_obj.cookie)
-            print gen
-            for i in gen:
-                print data[i-20:i+20]
-
+            param_obj.init_context()
         # Adding discovered links to queue
         queue.add_links(link_dict)
 
