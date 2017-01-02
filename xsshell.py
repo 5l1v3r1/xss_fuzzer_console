@@ -34,6 +34,11 @@ class usage:
            '  -threads n:  number of threads of execution for attack\n'\
            '  -delay n:    delay, in milliseconds, between network requests\n'\
            '  -depth n:    recursive depth when running spider\n'
+        self.spider = 'usage: ' + color('spider', 'YELLW') + color('  '\
+            '[start | stop]', 'GREEN') + '\n' \
+            'Options: \n' \
+            ' start:    begin spidering the target URL\n'\
+            ' stop:     stop spidering the target\n'
 
 
 queue = None # global object containing spidered links and other metadata 
@@ -88,7 +93,7 @@ def eval(input):
     # Command to execute spider threads to crawl a link
     elif args[0] == 'spider':
         if len(args) < 2:
-            ######## print use.set
+            print use.spider
             return
         global queue
         if args[1] == 'start':
@@ -103,10 +108,14 @@ def eval(input):
                 th.daemon = True
                 th.start()
         elif args[1] == 'stop':
-            queue.spider_continue = False
+            if queue != None:
+                queue.spider_continue = False
         else:
-            pass
-            # TODO make usage statement for spider #
+            print use.spider
+    
+    elif args[0] == 'attack'
+        pass
+
     # Command to print out status of current config values 
     elif args[0] == 'status':
         print '\n=== ' + color('Spider settings','YELLW') + ' ==='
