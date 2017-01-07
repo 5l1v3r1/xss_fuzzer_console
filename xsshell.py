@@ -39,6 +39,11 @@ class usage:
             'Options: \n' \
             ' start:    begin spidering the target URL\n'\
             ' stop:     stop spidering the target\n'
+        self.attack = 'usage: ' + color('attack', 'YELLW') + color('  '\
+            '[start | stop]', 'GREEN') + '\n' \
+            'Options: \n' \
+            ' start:    begin fuzzing the target\n'\
+            ' stop:     stop attacking the target\n'
 
 
 queue = None # global object containing spidered links and other metadata 
@@ -58,6 +63,7 @@ def main(arg):
 def eval(input):
     # Declaring setup variables
     global config
+    global queue
     use = usage()
     args = input.split() # Split arguments into a list
 
@@ -95,7 +101,6 @@ def eval(input):
         if len(args) < 2:
             print use.spider
             return
-        global queue
         if args[1] == 'start':
             # Initializing new attack queue structure
             queue = fuzz_thread.DictQueue({config.get('-target')
@@ -109,12 +114,28 @@ def eval(input):
                 th.start()
         elif args[1] == 'stop':
             if queue != None:
-                queue.spider_continue = False
+                queue.spider_running = False
         else:
             print use.spider
     
-    elif args[0] == 'attack'
-        pass
+    elif args[0] == 'attack':
+        if queue == None:
+            pass
+        if len(args) < 2:
+            print use.attack
+
+        elif args[1] == 'start':
+            # Creating 'n' asynchronous threads
+            for i in range(config.get('-threads')):
+                th = threading.Thread(name='spider_thread'+str(i), 
+                     target=fuzz_thread.attack_thread, args=(queue,))
+                th.daemon = True
+                th.start()
+        elif args[1] == 'stop':
+            if queue != None:
+                queue.attack_running = False
+        else:
+            print use.attack
 
     # Command to print out status of current config values 
     elif args[0] == 'status':

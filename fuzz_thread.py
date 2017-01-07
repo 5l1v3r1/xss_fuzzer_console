@@ -11,12 +11,10 @@ import util
 import sys
 import re
 
-
-
 # Synchronized Ordered Dictionary that serves as a queue
 class DictQueue:
-    attack_continue = True # Should attacking threads continue
-    spider_continue = True # Should spider threads continue
+    attack_running = True # Should attacking threads continue
+    spider_running = True # Should spider threads continue
     delay = 0 
     queue_size = 0
     cv = threading.Condition()
@@ -29,19 +27,29 @@ class DictQueue:
     # Adding initial target link
     def __init__(self, link):
         self.add_links(link)
-
+    
+    # Get URL for purposes of spidering
     def get_link(self):
-        # set timeout
+        #TODO set timeout
         self.cv.acquire()
         while not len(self.dict_queue):
             self.cv.wait()
-        self.queue_size -= 1
        
         item = self.dict_queue.popitem()             # pop from queue
         self.visited_links.update({item[0]:item[1]}) # add to visited dir
         self.cv.release()
 
         return item
+
+    # Get Attack Obj for purposes of attacking 
+    def get_attack_obj(self):
+        self.cv.acquire()
+        while not len(self.param_links):
+            self.cv.wait()
+       
+        dict_item = self.param_links.popitem()       # pop from queue
+        self.cv.release()
+        return dict_item[1] # Return AttackURL object 
 
     # Links added en-masse to avoid constant synch procedure calls
     def add_links(self, links): # links represented as a dictionary
@@ -57,7 +65,7 @@ class DictQueue:
             params = parse_qs(parse.query.encode('utf-8')) 
             if params: # If params, create attack object
                 # Create Attack Object
-                attack_obj = AttackURL.create(parse, params) 
+                attack_obj = AttackURL.create(self, parse, params) 
                 url = attack_obj.url # Retreive attack url
                 self.param_links.update({url: attack_obj})
             
@@ -85,7 +93,7 @@ class DictQueue:
 
 # Function executed by spider threads
 def spider_thread(queue):
-    while queue.spider_continue:
+    while queue.spider_running:
         # Retrieve URL and make connection
         link = queue.get_link()
         response = queue.delay_conn(link)
@@ -105,7 +113,8 @@ def spider_thread(queue):
 
 # Function executed by attack threads
 def attack_thread(queue):
-    while queue.attack_continue:
-        # Retrieve URL and make connection
+    print 'attack thread'
+    while queue.attack_running:
+        # Retrieve URL and make attack procedure call
         pass
 
