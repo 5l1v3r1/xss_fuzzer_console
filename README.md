@@ -1,5 +1,8 @@
 # Ty's XSS Fuzzer
 
+Note0: Still a WIP
+Note1: This is my first python program so the code may not be high quality stuff
+
 Semi-intelligent fuzzing tool. Program analyzes html output and constructs attack strings based on the output. If desired, the program will modify each character to attempt to bypass filtering. 
 
 One advantage of this fine-tuned approach is fewer network connections, so you don't have to flood the target network. 
