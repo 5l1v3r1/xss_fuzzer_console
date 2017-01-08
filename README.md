@@ -18,6 +18,7 @@ Connection Delay - Set connection delays to avoid flooding the target or to avoi
 ###Large 
 Stored XSS analysis<br>
 Right now only the spider has been implemented; initial version of fuzzer not added yet <br>
+Handle multiple simultaneous attack sessions (run multiple fuzzers and spiders simultaneously) <br>
 
 ###Medium 
 Handle JS reflect context<br>
@@ -31,5 +32,5 @@ Spider output when finished <br>
 Handle printing to sdout without disrupting the cmd line<br>
 Implement show command to show current attack urls <br>
 For showing specific url data show snippet of reflection and current fuzzer characters, and the target string<br>
-
+Rename DictQueue to something cooler like AttackSession or something <br>
 

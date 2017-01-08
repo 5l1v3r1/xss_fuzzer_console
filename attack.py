@@ -2,6 +2,7 @@
 from urlparse import urlparse, parse_qs, ParseResult
 from urllib import urlencode
 from collections import OrderedDict
+from copy import copy
 import os, binascii
 import random
 import string
@@ -29,7 +30,6 @@ class AttackContext:
     # Filter Fuzzing variables
     fuzz_str = ''      # String containing current fuzzer attack
     attack_str = ''    # String demonstrating successful attack
-    attempt_cnt = 0    # Current number of attempts
 
     '''
     f - filter avoidance dictionary
@@ -61,7 +61,7 @@ class AttackContext:
             elif i == '\'' or i == '\"' and self.in_value:
                 self.delimiter = i
         self.set_target_chars() # Identify fuzzer characters
-        self.make_fuzz_str()    # Construct fuzzer string
+        #self.make_fuzz_str()    # Construct fuzzer string
 
     # Set the Parent tag for the current context
     def set_tag(self, start, end):
@@ -119,11 +119,15 @@ class AttackContext:
 class AttackURL:
     queue = None # DictQueue object
     parsed_url = None
+    attempt_cnt = 0 # Number of attempts; Used for sorting
     cookie = str(binascii.b2a_hex(os.urandom(2))) # Generate cookie
     url = ''
     visited = False
     data = '' # html data
     atk_vectors = list() # attack vectors -- list of AttackContext's
+    # Necessary to have a list of attack points because an input may be 
+    # reflected at multiple points in the response, and each may be subject
+    # to different filtering methods. 
 
     def __init__(self, queue, parsed_url, url):
         self.queue = queue
@@ -144,13 +148,14 @@ class AttackURL:
             context = AttackContext(self.queue, self.parsed_url,
                                     self.data, self.cookie, pos)
 
-    # Generates an attack object for parameterized URLs
+    # Generates an attack object(s) as a list of parameterized URLs
     @staticmethod
     def create(queue, parsed_url, params):
         p = parsed_url
         # Changing each argument value to the cookie
-        new_url = gen_url(p, AttackURL.cookie) 
-        return AttackURL(queue, p, new_url) # Return new attack object
+        attack_dict = dict()
+        url_list = gen_urls(p, AttackURL.cookie) 
+        return url_list # list containing attack objects
 
     def attack(self):
         pass
@@ -159,14 +164,19 @@ class AttackURL:
 def gen_key():
     return ''.join(random.choice(string.ascii_uppercase) for _ in range(3))
 
-# Generate URL with custom query values
-def gen_url(p, value):
-    params = parse_qs(p.query.encode('utf-8')) 
-    for param in params.keys(): 
-        params[param] = value
-    new_params = urlencode(params, doseq=True)
-    print str(new_params)
-    return ParseResult(p.scheme, p.netloc, p.path, p.params,
-                       new_params, p.fragment).geturl()
+# Generate URL(s) with custom query value
+def gen_urls(p, value):
+    # Make a different URL for each query argument
+    query = parse_qs(p.query.encode('utf-8')) 
+    url_list = list()
+    for param in query.keys(): 
+        new_query_d = copy(query) # Copy of query dictionary
+        new_query_d[param] = value
+        new_query = urlencode(new_query_d, doseq=True) # New query string
+        # Gen and add new url to url list
+        url_list.append(ParseResult(p.scheme, p.netloc, p.path, p.params,
+                                    new_query, p.fragment).geturl())
+
+    return url_list # Return full list of all generated urls
 
 
