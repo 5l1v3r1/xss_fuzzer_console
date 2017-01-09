@@ -60,12 +60,11 @@ class DictQueue:
             return
         else:
             self.param_links.add(url)
-            self.param_atk.extend(atk_objs) # Extend, then sort   
-            #TODO Sort error
-            #self.param_atk.sort(key=lambda x: x.attempt_cnt,
-            #                    reverse = True)
-        #for _ in self.param_atk:
-        #    print str(_)
+            self.param_atk.extend(atk_objs) # Extend, then sort 
+            self.param_atk.sort(key=lambda x: x.attempt_cnt,
+                                reverse = True)
+        #for _ in atk_objs:
+        #    print _.attempt_cnt
 
         self.cv_atk.notifyAll()
         self.cv_atk.release()
@@ -109,6 +108,16 @@ class DictQueue:
         
         # Time of connection is not included in the delay
         return connect.scrape_links(link[0], link[1])
+    
+    # Provides thread-safe delayed connection. Returns the html response
+    def delay_conn_data(self, url):
+        if self.delay != 0: # Only one request per delay interval 
+            self.timer_lock.acquire()
+            time.sleep(self.delay)
+            self.timer_lock.release()
+        
+        # Time of connection ias not included in the delay
+        return connect.get_data(url)
 
 # Function executed by spider threads
 def spider_thread(queue):

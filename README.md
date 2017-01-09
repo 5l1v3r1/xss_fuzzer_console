@@ -26,8 +26,11 @@ Handle unique attribute reflect content<br>
 Improve Spider: Consider beautifulsoup, check 'src' attr<br>
 Check forms/input for URLs (currently only check a tags)<br>
 Make attack on main thread with a whole lot of progress output <br>
+Change maximum depth option, so that direct directory children receive the set depth, rather than getting decremented <br> 
 
 ###Small 
+Add Attack Attempt Count option <br>
+Add Parameter Limit option <br>
 Spider output when finished <br>
 Handle printing to sdout without disrupting the cmd line<br>
 Implement show command to show current attack urls <br>

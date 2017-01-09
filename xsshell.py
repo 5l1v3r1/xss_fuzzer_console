@@ -150,7 +150,7 @@ def eval(input):
             print (color('Links Found:   ', 'BLUE')  
                     + str(len(queue.dict_queue)))
             print (color('Parameterized Links: ', 'BLUE')
-                    + str(len(queue.param_links)))
+                    + str(len(queue.param_atk)))
         print '=======================\n'
 
        

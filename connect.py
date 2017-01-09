@@ -98,6 +98,16 @@ def scrape_links(url, depth):
     parser.close()
     return (parser.links, data) # links in the data + the data itself 
 
+# Connect to a url and return the data
+def get_data(url):
+    target = set_target(url)
+    conn = target[0]
+    result = target[1]
+    if result != 'Success':
+        return None
+    return conn.read()    
+
+
 # Gather our code in a main() function
 def main(url, path):
     scrape_links(url + path)

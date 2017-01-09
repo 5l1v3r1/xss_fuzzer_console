@@ -67,7 +67,7 @@ class AttackContext:
     def set_tag(self, start, end):
         # Split using space as delimiter
         no_space = self.data[start:end].split(' ')
-	tag = no_space[0]
+        tag = no_space[0]
         
         # If tag is closed, make sure closing tag isn't included
         if self.tag_closed:
@@ -138,27 +138,43 @@ class AttackURL:
         self.data = data
         visited = True
 
+    # If a single input is reflected multiple times, each reflection 
+    # receives its own context object containing unique attack data
     def init_context(self):
-        if self.data == '':
-            return None
+        reflected = False
+        if self.data == None or self.data == '':
+            return False
         
         # Find all cookie reflections in the HTML
         match = util.string_match(self.data, self.cookie)
         for pos in match:
+            reflected = True
             context = AttackContext(self.queue, self.parsed_url,
                                     self.data, self.cookie, pos)
+        if not reflected: # Unsuccesful -- No instances of reflection
+            return False
+        else:             # Succesful -- Reflected within HTML
+            return True
 
     # Generates an attack object(s) as a list of parameterized URLs
     @staticmethod
     def create(queue, parsed_url, params):
+        atk_objs = list()
         p = parsed_url
         # Changing each argument value to the cookie
         attack_dict = dict()
         url_list = gen_urls(p, AttackURL.cookie) 
-        return url_list # list containing attack objects
+        for url in url_list:
+            atk_objs.append(AttackURL(queue, p, url))            
 
+        return atk_objs # list containing attack objects
+
+    # Called by attack thread to initiate an attack on a single context
     def attack(self):
-        pass
+        if self.data == '' # Indicates uninitalized context
+            self.data = delay_conn_data(self.url)
+            success = self.init_context()
+            if not success: return False 
 
 # Generate random two character key
 def gen_key():
