@@ -27,8 +27,10 @@ Improve Spider: Consider beautifulsoup, check 'src' attr<br>
 Check forms/input for URLs (currently only check a tags)<br>
 Make attack on main thread with a whole lot of progress output <br>
 Change maximum depth option, so that direct directory children receive the set depth, rather than getting decremented <br> 
+Make it so that on first connection, for one of the parameterized url's query parameters, the html response will be saved for that AttackURL (kind of unintelligible). This will reduce at least one network connection per url <br> 
 
 ###Small 
+Add spider duration option <br> 
 Add Attack Attempt Count option <br>
 Add Parameter Limit option <br>
 Spider output when finished <br>

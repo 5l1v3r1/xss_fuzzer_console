@@ -4,21 +4,19 @@ from urllib import urlencode
 from collections import OrderedDict
 from copy import copy
 import os, binascii
+import hashlib
 import random
 import string
 import util
 
-# TODO ONE PARAM AT A TIME ... This is important because one param
-# may cause 500 error if some critical boolean value is change dto cookie
-
 # Class containing necessary metadata for each attack vector
 class AttackContext:
     # Context essentially refers to the attack location 
-    queue = None       # Make DictQueue object
-    parse_url = None   # Parsed URL object
-    cookie = ''        # Inserted cookie to find
+    parent = None      # Parent used to reference variables
     data = ''          # Raw HTML
-
+    depth = 0          # Length of local_html string
+    local_html = None  # Hash of html data before the cookie position
+                       # Used to locate proper pos on additional requests
     # Initial data parsing variables
     tag = ''           # Direct Parent Tag
     tag_closed = False # Has the open parent tag been closed
@@ -38,15 +36,12 @@ class AttackContext:
     f = OrderedDict()
 
     # Initialize class variables and parse current context
-    def __init__(self, queue, parsed_url, data, cookie, pos):
-        self.queue = queue
-        self.parsed_url = parsed_url
-        self.data = data
-        self.cookie = cookie
+    def __init__(self, parent, pos):
+        self.parent = parent
         self.key = gen_key()
         d = 0 # Distance from initial pos
 
-        for i in reversed(data[0:pos]):
+        for i in reversed(parent.data[0:pos]):
             d += 1
             if i == '>': # Parent tag is closed
                 self.tag_closed = True
@@ -60,13 +55,15 @@ class AttackContext:
             # Checking value delimiter
             elif i == '\'' or i == '\"' and self.in_value:
                 self.delimiter = i
+        # String equality is O(n), so using hash for quick comparison
+        self.local_html = hashlib.md5(self.parent.data[pos-d: pos]) \
+                                 .hexdigest()
         self.set_target_chars() # Identify fuzzer characters
-        #self.make_fuzz_str()    # Construct fuzzer string
 
     # Set the Parent tag for the current context
     def set_tag(self, start, end):
         # Split using space as delimiter
-        no_space = self.data[start:end].split(' ')
+        no_space = self.parent.data[start:end].split(' ')
         tag = no_space[0]
         
         # If tag is closed, make sure closing tag isn't included
@@ -100,20 +97,29 @@ class AttackContext:
     
     # Construct a fuzzing string to account for filtering
     def make_fuzz_str(self):
-        fuzz = self.cookie 
+        fuzz = self.parent.cookie 
         for char in self.f.values():
             fuzz += self.key
             fuzz += char
-        print 'fuzz ' + fuzz
-        print gen_url(self.parsed_url, fuzz)
+        ret = gen_urls(self.parent.parsed_url, fuzz, 
+                       self.parent.param)
+        # gen_urls returns a list of tuples
+        self.fuzz_str = ret[0][0] 
 
     # Construct a functional string to introduce an alert script
     def make_atk_str(self):
+        # TODO Occurs when fuzz 
         pass
 
     # Fuzz the context using the fuzzer string
     def fuzz_context(self):
-        pass
+        self.make_fuzz_str()    # Construct fuzzer string
+        # 1 Make connection
+        # 2 Check response, set data, determine if reflected
+        #   at desired location by comparing with local_html 
+        #   depth
+        # 3 Return false if context should be removed (cookie not reflected)
+        # 4 Return True and modify filter dictionary otherwise
 
 # Class containing Attack URLs with their associated metadata
 class AttackURL:
@@ -124,15 +130,17 @@ class AttackURL:
     url = ''
     visited = False
     data = '' # html data
-    atk_vectors = list() # attack vectors -- list of AttackContext's
+    param = '' # Param modified for the current url 
+    atk_contexts = list() # list of AttackContext objects
     # Necessary to have a list of attack points because an input may be 
     # reflected at multiple points in the response, and each may be subject
     # to different filtering methods. 
 
-    def __init__(self, queue, parsed_url, url):
+    def __init__(self, queue, parsed_url, url, param):
         self.queue = queue
         self.parsed_url = parsed_url
         self.url = url
+        self.param = param
 
     def set_data(self, data):
         self.data = data
@@ -149,8 +157,9 @@ class AttackURL:
         match = util.string_match(self.data, self.cookie)
         for pos in match:
             reflected = True
-            context = AttackContext(self.queue, self.parsed_url,
-                                    self.data, self.cookie, pos)
+            context = AttackContext(self, pos)
+            self.atk_contexts.append(context) # Add to list of attack contexts
+
         if not reflected: # Unsuccesful -- No instances of reflection
             return False
         else:             # Succesful -- Reflected within HTML
@@ -164,34 +173,42 @@ class AttackURL:
         # Changing each argument value to the cookie
         attack_dict = dict()
         url_list = gen_urls(p, AttackURL.cookie) 
-        for url in url_list:
-            atk_objs.append(AttackURL(queue, p, url))            
+        for url, param  in url_list:
+            atk_objs.append(AttackURL(queue, p, url, param))            
 
         return atk_objs # list containing attack objects
 
     # Called by attack thread to initiate an attack on a single context
     def attack(self):
-        if self.data == '' # Indicates uninitalized context
-            self.data = delay_conn_data(self.url)
+        if self.data == '': # Indicates uninitalized context
+            self.data = self.queue.delay_conn_data(self.url)
             success = self.init_context()
             if not success: return False 
+        for context in self.atk_contexts:
+            context.fuzz_context()
+            # TODO return true or false if need to remove from atk_contexts
+        return True
 
 # Generate random two character key
 def gen_key():
     return ''.join(random.choice(string.ascii_uppercase) for _ in range(3))
 
 # Generate URL(s) with custom query value
-def gen_urls(p, value):
+# Returns a list of tuple pairs containing url and the parameter changed
+def gen_urls(p, value, target_param=''):
+    print 'gen_urls ' + target_param
     # Make a different URL for each query argument
     query = parse_qs(p.query.encode('utf-8')) 
     url_list = list()
     for param in query.keys(): 
-        new_query_d = copy(query) # Copy of query dictionary
-        new_query_d[param] = value
-        new_query = urlencode(new_query_d, doseq=True) # New query string
-        # Gen and add new url to url list
-        url_list.append(ParseResult(p.scheme, p.netloc, p.path, p.params,
-                                    new_query, p.fragment).geturl())
+        if target_param == '' or target_param == param:
+            new_query_d = copy(query) # Copy of query dictionary
+            new_query_d[param] = value
+            new_query = urlencode(new_query_d, doseq=True) # New query 
+            # Gen and add new url to url list
+            url = ParseResult(p.scheme, p.netloc, p.path, p.params,
+                              new_query, p.fragment).geturl()
+            url_list.append((url, param))
 
     return url_list # Return full list of all generated urls
 

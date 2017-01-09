@@ -147,5 +147,11 @@ def attack_thread(queue):
 
     while queue.attack_running:
         # Retrieve URL and make attack procedure call
-        pass
+        obj = queue.get_attack_obj()
+        success = obj.attack() 
+        if success:
+            pass # Readd if successful (Nothing went wrong)
+
+
+
 
