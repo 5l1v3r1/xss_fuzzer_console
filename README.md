@@ -1,4 +1,5 @@
 # Ty's XSS Fuzzer
+# NOTE: This is still a WIP, but it should be functioning at a basic level by 1/14/17
 
 Note0: Still a WIP <br>
 Note1: This is my first python program so the code may not be high quality stuff <br>
