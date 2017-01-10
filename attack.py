@@ -28,7 +28,7 @@ class AttackContext:
     # Filter Fuzzing variables
     fuzz_str = ''      # String containing current fuzzer attack
     attack_str = ''    # String demonstrating successful attack
-
+    _ = ''
     '''
     f - filter avoidance dictionary
     Value is a tuple of (attack_char, passed_filter ) where passed
@@ -58,6 +58,8 @@ class AttackContext:
         # String equality is O(n), so using hash for quick comparison
         self.local_html = hashlib.md5(self.parent.data[pos-d: pos]) \
                                  .hexdigest()
+        self._ = self.parent.data[pos-d: pos]
+        self.depth = d
         self.set_target_chars() # Identify fuzzer characters
 
     # Set the Parent tag for the current context
@@ -113,9 +115,30 @@ class AttackContext:
 
     # Fuzz the context using the fuzzer string
     def fuzz_context(self):
+        success = False
         self.make_fuzz_str()    # Construct fuzzer string
         # 1 Make connection
+        self.data = self.parent.queue.delay_conn_data(self.fuzz_str)
         # 2 Check response, set data, determine if reflected
+        # Find all reflections in the HTML
+        match = util.string_match(self.data, self.parent.cookie)
+        print '== Begin: ' + self.fuzz_str + ' === '
+        for pos in match:
+            print 'NEW POS ==============================='
+            print self._
+            print self.data[pos-self.depth: pos]
+            hash_data = hashlib.md5(self.data[pos-self.depth: pos]) \
+                               .hexdigest()
+            print 'orig ' + self.local_html
+            print 'new  ' + hash_data
+            if hash_data == self.local_html:
+                success = True
+                break
+        if success:
+            print 'Match Found'
+        else:
+            print 'FAILURE FAILURE FAILURE FAILURE FAILURE FAILURE FAILURE FAUILRUE'
+            print self.data
         #   at desired location by comparing with local_html 
         #   depth
         # 3 Return false if context should be removed (cookie not reflected)
@@ -187,6 +210,7 @@ class AttackURL:
         for context in self.atk_contexts:
             context.fuzz_context()
             # TODO return true or false if need to remove from atk_contexts
+        self.attempt_cnt += 1 # Increment attempt number
         return True
 
 # Generate random two character key
@@ -196,7 +220,6 @@ def gen_key():
 # Generate URL(s) with custom query value
 # Returns a list of tuple pairs containing url and the parameter changed
 def gen_urls(p, value, target_param=''):
-    print 'gen_urls ' + target_param
     # Make a different URL for each query argument
     query = parse_qs(p.query.encode('utf-8')) 
     url_list = list()

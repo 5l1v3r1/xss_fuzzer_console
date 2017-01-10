@@ -43,8 +43,8 @@ class DictQueue:
     # Get Attack Obj for purposes of attacking 
     def get_attack_obj(self):
         self.cv_atk.acquire()
-        while not len(self.param_links):
-            self.cv.wait()
+        while not len(self.param_atk):
+            self.cv_atk.wait()
        
         atk_obj = self.param_atk.pop()   # pop from queue
         self.cv_atk.release()
@@ -57,6 +57,7 @@ class DictQueue:
         atk_objs = objects[1]
         # Checking for duplicates, then adding to queue
         if url in self.param_links: # Already added links
+            self.cv_atk.release()
             return
         else:
             self.param_links.add(url)
@@ -137,7 +138,6 @@ def spider_thread(queue):
         #    param_obj.init_context()
         # Adding discovered links to queue
         queue.add_links(link_dict)
-
 
 # Function executed by attack threads
 def attack_thread(queue):

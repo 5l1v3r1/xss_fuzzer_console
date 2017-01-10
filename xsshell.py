@@ -55,7 +55,8 @@ def main(arg):
     while 1 :
         try:
             input = raw_input(cmd)
-            eval(input)
+            if input:
+                eval(input)
         except EOFError:
             print 'Exiting (Ctrl+D)'
             break
