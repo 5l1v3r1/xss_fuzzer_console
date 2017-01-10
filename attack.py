@@ -8,8 +8,13 @@ import hashlib
 import random
 import string
 import util
-
-# Class containing necessary metadata for each attack vector
+import time
+""" Class containing necessary metadata for each attack vector
+Purpose: Each time an input is reflected in the html, that reflection
+receives its own context. This is because each location may be subject
+to different filtering, and each will definitely have a different
+"escape route"
+"""
 class AttackContext:
     # Context essentially refers to the attack location 
     parent = None      # Parent used to reference variables
@@ -23,14 +28,13 @@ class AttackContext:
     is_js = False      # In a javascript context
     in_value = True    # Has iteration passed the assignment
     delimiter = ''     # Is the input encapsulated by ' or "
-    key = ''           # identifier for context and attack string
+    key = 'zxz'        # identifier for context and attack string
 
     # Filter Fuzzing variables
     fuzz_str = ''      # String containing current fuzzer attack
+    fuzz_payload = ''  # String containing fuzzer url payload
     attack_str = ''    # String demonstrating successful attack
-    _ = ''
-    '''
-    f - filter avoidance dictionary
+    ''' f - filter avoidance dictionary
     Value is a tuple of (attack_char, passed_filter ) where passed
     filter means that it successfuly reflected onto the page '''
     f = OrderedDict()
@@ -38,7 +42,7 @@ class AttackContext:
     # Initialize class variables and parse current context
     def __init__(self, parent, pos):
         self.parent = parent
-        self.key = gen_key()
+        #self.key = gen_key()
         d = 0 # Distance from initial pos
 
         for i in reversed(parent.data[0:pos]):
@@ -83,14 +87,14 @@ class AttackContext:
             # Need chars: < / > script
             self.f.update({'<':'<',
                            '/':'/',
-                           '>':'<',
+                           '>':'>',
                            'script':'script'})
         else: # Desired objective is to introduce new attr
             # TODO for these you don't need to escape completely, you
             # can instead just introduce a new attribute like onerror
-            self.f.update({'<':'<',
+            self.f.update({'<':'%3C',
                            '/':'/',
-                           '>':'<',
+                           '>':'%3E',
                            'script':'script'})
 
         if self.is_js:
@@ -99,48 +103,48 @@ class AttackContext:
     
     # Construct a fuzzing string to account for filtering
     def make_fuzz_str(self):
-        fuzz = self.parent.cookie 
+        payload = self.parent.cookie + self.key 
         for char in self.f.values():
-            fuzz += self.key
-            fuzz += char
-        ret = gen_urls(self.parent.parsed_url, fuzz, 
+            payload += char
+            payload += self.key
+        ret = gen_urls(self.parent.parsed_url, payload, 
                        self.parent.param)
         # gen_urls returns a list of tuples
         self.fuzz_str = ret[0][0] 
+        self.fuzz_payload = payload
 
     # Construct a functional string to introduce an alert script
     def make_atk_str(self):
-        # TODO Occurs when fuzz 
+        # TODO Occurs when fuzz succeeds
+        # Use the filter dict along with other data to construct
+        # The escape route along with an alert script
         pass
 
     # Fuzz the context using the fuzzer string
     def fuzz_context(self):
         success = False
         self.make_fuzz_str()    # Construct fuzzer string
-        # 1 Make connection
         self.data = self.parent.queue.delay_conn_data(self.fuzz_str)
-        # 2 Check response, set data, determine if reflected
-        # Find all reflections in the HTML
+        cookie_pos = 0
+        
+        # String match necessary because using a static pos is unreliable
         match = util.string_match(self.data, self.parent.cookie)
-        print '== Begin: ' + self.fuzz_str + ' === '
-        for pos in match:
-            print 'NEW POS ==============================='
-            print self._
-            print self.data[pos-self.depth: pos]
+        for pos in match: # Find all reflections in the HTML
             hash_data = hashlib.md5(self.data[pos-self.depth: pos]) \
                                .hexdigest()
-            print 'orig ' + self.local_html
-            print 'new  ' + hash_data
             if hash_data == self.local_html:
                 success = True
+                cookie_pos = pos
                 break
-        if success:
-            print 'Match Found'
-        else:
-            print 'FAILURE FAILURE FAILURE FAILURE FAILURE FAILURE FAILURE FAUILRUE'
-            print self.data
-        #   at desired location by comparing with local_html 
-        #   depth
+        if not success:
+            print 'Match not found. Yea, this probably shouldn\'t have happened. Output:'
+            #print self.data
+            return success # fuzzing failure, context will be removed
+
+        reflected = self.data[cookie_pos:                         \
+                         cookie_pos + len(self.fuzz_payload) * 3] \
+                        .split(self.key)[1:-1]
+        print str(reflected)
         # 3 Return false if context should be removed (cookie not reflected)
         # 4 Return True and modify filter dictionary otherwise
 

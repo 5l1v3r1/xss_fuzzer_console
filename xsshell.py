@@ -168,6 +168,8 @@ def print_help():
     print _ + color('set', 'YELLW') + ' - set certain configuration values.'
     print _ + color('spider', 'YELLW') \
             + ' - extract all the links from the target'
+    print _ + color('attack', 'YELLW') \
+            + ' - fuzz links extracted by the spider'
     print '================\n'
 
 

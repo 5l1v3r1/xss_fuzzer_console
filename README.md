@@ -22,6 +22,8 @@ Right now only the spider has been implemented; initial version of fuzzer not ad
 Handle multiple simultaneous attack sessions (run multiple fuzzers and spiders simultaneously) <br>
 
 ###Medium 
+Add Options to Scan Robots.txt<br>
+Check for /sitemap.html or /sitemap.xml for spider<br>
 Handle JS reflect context<br>
 Handle unique attribute reflect content<br>
 Improve Spider: Consider beautifulsoup, check 'src' attr<br>
@@ -30,6 +32,7 @@ Make attack on main thread with a whole lot of progress output <br>
 Change maximum depth option, so that direct directory children receive the set depth, rather than getting decremented <br> 
 Make it so that on first connection, for one of the parameterized url's query parameters, the html response will be saved for that AttackURL (kind of unintelligible). This will reduce at least one network connection per url <br> 
 Allow saving config and loading ( set -s _name_ ) <br> 
+Consider allowing scope modification -- Expand upon set -target
 
 ###Small 
 Add spider duration option <br> 
