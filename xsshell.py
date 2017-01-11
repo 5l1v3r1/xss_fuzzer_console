@@ -103,6 +103,9 @@ def eval(input):
             print use.spider
             return
         if args[1] == 'start':
+            print (color('Spider started. Type ', 'BLUE') + 
+                   color('spider stop ', 'BOLD') + 
+                   color('to stop the spider.', 'BLUE'))
             # Initializing new attack queue structure
             queue = fuzz_thread.DictQueue({config.get('-target')
                                           :config.get('-depth')})
@@ -158,7 +161,8 @@ def eval(input):
 
 def print_help():
     _ = '   '
-    print '\n=== ' + color('Commands','YELLW') + ' ==='
+    print '\n=========== ' + color('Commands','YELLW') + ' ==========='
+#print 'To see a command\'s usage statement, enter it into the command line'
     print _ + color('help','YELLW') + ' - print this message.'
     print _ + color('exit','YELLW') + ' - exit this terminal.'
     print _ + color('status','YELLW') + ' - show config values and ' \
@@ -166,12 +170,11 @@ def print_help():
     print _ + color('info','YELLW') + color(' job_name', 'GREEN') \
             + ' - show info about a job.'
     print _ + color('set', 'YELLW') + ' - set certain configuration values.'
-    print _ + color('spider', 'YELLW') \
+    print _ + color('spider', 'RED') \
             + ' - extract all the links from the target'
-    print _ + color('attack', 'YELLW') \
+    print _ + color('attack', 'RED') \
             + ' - fuzz links extracted by the spider'
-    print '================\n'
-
+    print '================================\n'
 
 def color(text, colorStr):
     return col_d[colorStr] + text + col_d['ENDC']

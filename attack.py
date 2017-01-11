@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from urlparse import urlparse, parse_qs, ParseResult
-from urllib import urlencode
-from collections import OrderedDict
+from urllib import urlencode, quote_plus
 from copy import copy
 import os, binascii
 import hashlib
@@ -34,10 +33,10 @@ class AttackContext:
     fuzz_str = ''      # String containing current fuzzer attack
     fuzz_payload = ''  # String containing fuzzer url payload
     attack_str = ''    # String demonstrating successful attack
-    ''' f - filter avoidance dictionary
+    ''' f - filter avoidance list
     Value is a tuple of (attack_char, passed_filter ) where passed
     filter means that it successfuly reflected onto the page '''
-    f = OrderedDict()
+    f = list()
 
     # Initialize class variables and parse current context
     def __init__(self, parent, pos):
@@ -81,21 +80,21 @@ class AttackContext:
     # Determine necessary characters for escape
     def set_target_chars(self):
         if self.delimiter != '':
-            self.f.update({self.delimiter:self.delimiter})
+            self.f.append([self.delimiter, self.delimiter, False])
         
         if self.tag_closed: # Inside of tag content section
             # Need chars: < / > script
-            self.f.update({'<':'<',
-                           '/':'/',
-                           '>':'>',
-                           'script':'script'})
+            self.f.extend([['<','<',False],
+                           ['/','/',False],
+                           ['>','>',False],
+                           ['script','script',False]])
         else: # Desired objective is to introduce new attr
             # TODO for these you don't need to escape completely, you
             # can instead just introduce a new attribute like onerror
-            self.f.update({'<':'%3C',
-                           '/':'/',
-                           '>':'%3E',
-                           'script':'script'})
+            self.f.extend([['<','<',False],
+                           ['/','/',False],
+                           ['>','>',False],
+                           ['script','script',False]])
 
         if self.is_js:
             self.f.update({';':';'})
@@ -104,8 +103,8 @@ class AttackContext:
     # Construct a fuzzing string to account for filtering
     def make_fuzz_str(self):
         payload = self.parent.cookie + self.key 
-        for char in self.f.values():
-            payload += char
+        for val in self.f:
+            payload += val[1] # tuple index
             payload += self.key
         ret = gen_urls(self.parent.parsed_url, payload, 
                        self.parent.param)
@@ -137,16 +136,34 @@ class AttackContext:
                 cookie_pos = pos
                 break
         if not success:
-            print 'Match not found. Yea, this probably shouldn\'t have happened. Output:'
+            print 'Match not found.'
             #print self.data
             return success # fuzzing failure, context will be removed
-
+        # Getting parameters from data
         reflected = self.data[cookie_pos:                         \
                          cookie_pos + len(self.fuzz_payload) * 3] \
                         .split(self.key)[1:-1]
-        print str(reflected)
-        # 3 Return false if context should be removed (cookie not reflected)
-        # 4 Return True and modify filter dictionary otherwise
+        if len(reflected) != len(self.f):
+            # TODO debug whatever is causing this to generated mismatch
+            # https://stackoverflow.com/users/login?ssrc=head&returnurl=b2ec
+            print ' Size mismatch '
+            print str(reflected)
+            print self.fuzz_str
+            print self.parent.url
+        print ' ----------- '
+        # Check reflection success and apply input modification
+        for i, val in enumerate(reflected):
+            # Only check characters that haven't been reflected yet
+            if not self.f[i][2]:
+                # If reflection matches target character
+                if val == self.f[i][0] or val == quote_plus(self.f[i][0]):
+                    print 'match ' + val
+                    self.f[i][2] = True # Val successfully reflected
+                else:
+                    pass
+                    # Apply bypass shit
+
+        return True # Context will not be deleted
 
 # Class containing Attack URLs with their associated metadata
 class AttackURL:
