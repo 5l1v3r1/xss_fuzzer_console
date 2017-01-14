@@ -1,5 +1,8 @@
 # Ty's XSS Fuzzer
 
+How to:
+Launch console with python xsshell.py
+
 Note0: Still a WIP <br>
 Note1: This is my first python program so the code may not be high quality stuff <br>
 
