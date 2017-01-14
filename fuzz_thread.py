@@ -50,7 +50,7 @@ class DictQueue:
         self.cv_atk.release()
         return atk_obj # Return AttackURL object 
 
-    # Add attack objects to param_atk list
+    # Add list of attack objects to param_atk list
     def add_attack_objects(self, objects):
         self.cv_atk.acquire() # Mutex to ensure atomic queue modification
         url = objects[0]
@@ -62,12 +62,22 @@ class DictQueue:
         else:
             self.param_links.add(url)
             self.param_atk.extend(atk_objs) # Extend, then sort 
-            self.param_atk.sort(key=lambda x: x.attempt_cnt,
-                                reverse = True)
+            self.param_atk.sort(key=lambda x: x.attempt_cnt)
         #for _ in atk_objs:
         #    print _.attempt_cnt
 
         self.cv_atk.notifyAll()
+        self.cv_atk.release()
+
+    # Add single object -- Used for re-adding objects after attacking
+    def add_attack_object(self, obj):
+        self.cv_atk.acquire() # Mutex to ensure atomic queue modification
+        self.param_atk.append(obj) # Extend, then sort 
+        self.param_atk.sort(key=lambda x: x.attempt_cnt)
+
+        #for _ in self.param_atk:
+        #    print _.attempt_cnt
+        self.cv_atk.notify()
         self.cv_atk.release()
 
     # Links added en-masse to avoid constant synch procedure calls
@@ -149,9 +159,8 @@ def attack_thread(queue):
         # Retrieve URL and make attack procedure call
         obj = queue.get_attack_obj()
         success = obj.attack() 
-        if success:
-            pass # Readd if successful (Nothing went wrong)
-
+        if success: # Add back to queue
+            queue.add_attack_object(obj)
 
 
 

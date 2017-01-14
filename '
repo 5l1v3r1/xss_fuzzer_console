@@ -82,9 +82,7 @@ class AttackContext:
     def set_target_chars(self):
         if self.delimiter != '':
             self.f.append([self.delimiter, self.delimiter, False])
-        else: 
-            self.f.append(['','', True]) # Dummy var
-
+        
         if self.tag_closed: # Inside of tag content section
             # Need chars: < / > script
             self.f.extend([['<','<',False],
@@ -117,22 +115,10 @@ class AttackContext:
 
     # Construct a functional string to introduce an alert script
     def make_atk_str(self):
-        # TODO Make sure the is_js scenario has a diferent output
-        # Also tag attribute attack also needs different attack
-        delim    = self.f[0][1]
-        open_br  = self.f[1][1]
-        slash    = self.f[2][1]
-        close_br = self.f[3][1]
-        script   = self.f[4][1]
-        if self.tag_closed:
-            print 'tag_closed'
-        else:
-            print 'tag_unclosed'
-        alert = open_br + script + close_br + 'alert(1)' +  \
-                open_br + slash + script + close_br
-        ret = gen_urls(self.parent.parsed_url, alert, 
-                       self.parent.param)
-        print ret[0][0]
+        # TODO Occurs when fuzz succeeds
+        # Use the filter dict along with other data to construct
+        # The escape route along with an alert script
+        pass
 
     # Fuzz the context using the fuzzer string
     def fuzz_context(self):
@@ -184,7 +170,9 @@ class AttackContext:
                 reflect_cnt += 1
         
         if reflect_cnt == len(self.f):
-            self.make_atk_str()
+            print 'Reflected'
+            pass
+            # Set flag in parent indicating that the search is finished
 
         return True # Context will not be deleted
 
