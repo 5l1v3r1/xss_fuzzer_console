@@ -4,54 +4,63 @@
 import httplib
 import urllib2
 from urlparse import urlparse
-from HTMLParser import HTMLParser
+from bs4 import BeautifulSoup
 
-class MyHTMLParser(HTMLParser):
-    links = {}
-    scheme = "" # url scheme such as http or https
-    base_url = ""
-    base_path = ""
-    depth = 0
-
-    def set_target(self, url) :
-        # Parsing target url with urlparse library
-        o = urlparse(url)
-        self.scheme = o.scheme
-        self.base_url   =  o.netloc 
-        self.base_path  = o.path   
-
-    def handle_starttag(self, tag, attrs):
+# Parse links from html
+def parse_html(target, data, depth):
+    soup = BeautifulSoup(data, 'html.parser')
+    o = urlparse(target)
+    scheme     = o.scheme # Http or Https 
+    base_url   = o.netloc # base url (www. -> .com)
+    base_path  = o.path   # file path following netloc
+    links = {}            # dict of valid links
+    
+    # Parse <a> tags
+    for link in soup.find_all('a'):
         valid = False    # is url valid
         relative = False # is link relative url addressing
-     
-        # If tag is a link
-        if tag == "a":
-            for name, value in attrs:
-                # Webpage link
-                if name == "href":
-                    if value == '':
-                        continue  
-                    o = urlparse(value)
-                    if o.netloc == '': 
-                        relative = True # default is False
+        value = link.get('href') # link url
+        if value == None:
+            continue  
 
-                    # Check if absolute URL is in scope
-                    if not relative:
-                        if o.netloc == self.base_url:
-                            valid = True
-                    # If address begins with '/' it's relative to base url
-                    # Otherwise address is relative to base + path url
-                    else:
-                        valid = True # Relative will usually be valid
-                        if value[0] != '/':
-                            value = (self.scheme + '://' + self.base_url 
-                                  + self.base_path + value)
-                        else:
-                            value = (self.scheme + '://' +  self.base_url 
-                                  + value)
-                    if valid:
-                        self.links.update({value : self.depth})
-                
+        o = urlparse(value)
+        if o.netloc == '': 
+            relative = True # default is False
+
+        # Check if absolute URL is in scope
+        if not relative:
+            if o.netloc == base_url:
+                valid = True
+        # If address begins with '/' it's relative to base url
+        # Otherwise address is relative to base + path url
+        else:
+            valid = True # Relative will usually be valid
+            if value[0] != '/': # Start from target dir
+                value = scheme + '://' + base_url + base_path + value
+            else:               # Start from root dir
+                value = scheme + '://' + base_url + value
+        if valid:
+            links.update({value : depth})
+            
+    # Parse all forms 
+    for form in soup.find_all('form'):
+        value = scheme + '://' + base_url + base_path 
+        if form.get('method') != 'GET': # Only parse GET requests
+            continue;
+
+        inputs = form.find_all('input') # List of inputs for form
+        if not inputs:
+            continue; 
+
+        # O(n^2), but there will usually only be 1 or 2 inputs
+        for input in inputs:
+            name = input.get('name')
+            if name:
+                value = value + '?' + name + '=abc'
+        links.update({value : depth})
+    return links
+
+
 # Set attack target. Make connection to ensure valid target
 def set_target(request): 
     connfd = None
@@ -91,12 +100,9 @@ def scrape_links(url, depth):
         data = data.decode(encoding)
     
     # Parse html response
-    parser = MyHTMLParser()
-    parser.depth = depth - 1
-    parser.set_target(url)
-    parser.feed(data)
-    parser.close()
-    return (parser.links, data) # links in the data + the data itself 
+    links = parse_html(url, data, depth-1)
+    print len(links)
+    return (links, data) # links in the data + the data itself 
 
 # Connect to a url and return the data
 def get_data(url):
@@ -110,9 +116,10 @@ def get_data(url):
 
 # Gather our code in a main() function
 def main(url, path):
-    scrape_links(url + path)
+    scrape_links(url + path, 10)
 
 if __name__ == '__main__':
     url = 'https://resources.allsetlearning.com' 
     path = '/chinese/grammar/'
+    url = 'https://xss-game.appspot.com/level1/frame'  
     main(url, path)
