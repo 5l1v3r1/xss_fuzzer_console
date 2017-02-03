@@ -10,7 +10,7 @@ install:
       - pip install coverage
       - pip install numpy
       - pip install pylint
-
+      - pip install BeautifulSoup4
 before_script:
       - uname -a
       - printenv | sort
