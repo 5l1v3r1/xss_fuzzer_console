@@ -16,6 +16,6 @@ before_script:
       - printenv | sort
 
 script:
-      - python tests.py
+      - make test 
 
 

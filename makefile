@@ -7,7 +7,7 @@ FILES :=            \
 	intro.py		\
  	README.md 		\
 	thread.py 		\
-	tests.py 		\
+	TestFuzzer.py   \
 	util.py 		\
 	xsshell.py
 
@@ -15,28 +15,28 @@ ifeq ($(shell uname), Darwin)          # Apple
     PYTHON   := python2.7
     PIP      := pip2.7
     PYLINT   := pylint
-    COVERAGE := coverage-2.7
+    COVERAGE := coverage
     PYDOC    := pydoc2.7
     AUTOPEP8 := autopep8
 else ifeq ($(CI), true)                # Travis CI
     PYTHON   := python2.7
     PIP      := pip2.7
     PYLINT   := pylint
-    COVERAGE := coverage-2.7
+    COVERAGE := coverage 
     PYDOC    := pydoc2.7
     AUTOPEP8 := autopep8
 else ifeq ($(shell uname -p), unknown) # Docker
     PYTHON   := python2.7
     PIP      := pip2.7
     PYLINT   := pylint
-    COVERAGE := coverage-2.7
+    COVERAGE := coverage 
     PYDOC    := pydoc2.7
     AUTOPEP8 := autopep8
 else                                   # UTCS
     PYTHON   := python2.7
     PIP      := pip2.7
     PYLINT   := pylint
-    COVERAGE := coverage-2.7
+    COVERAGE := python -m coverage
     PYDOC    := pydoc2.7
     AUTOPEP8 := autopep8
 endif
@@ -56,11 +56,11 @@ Fuzzer.log:
 	#diff RunCollatz.tmp RunCollatz.out
 
 .PHONY: TestFuzzer.tmp
-TestCollatz.tmp: .pylintrc
+TestFuzzer.tmp: .pylintrc
 	-$(PYLINT) TestFuzzer.py
-	-$(COVERAGE) run    --branch TestCollatz.py >  TestCollatz.tmp 2>&1
-	-$(COVERAGE) report -m                      >> TestCollatz.tmp
-	cat TestCollatz.tmp
+	-$(COVERAGE) run    --branch TestFuzzer.py >  TestFuzzer.tmp 2>&1
+	-$(COVERAGE) report -m                     >> TestFuzzer.tmp
+	cat TestFuzzer.tmp
 
 check:
 	@not_found=0;                                 \
@@ -94,7 +94,7 @@ format:
 	
 	$(AUTOPEP8) -i attack.py   
 	$(AUTOPEP8) -i fuzz_thread.py  
-	$(AUTOPEP8) -i tests.py   
+	$(AUTOPEP8) -i TestFuzzer.py   
 	$(AUTOPEP8) -i util.py
 	$(AUTOPEP8) -i connect.py  
 	$(AUTOPEP8) -i intro.py        
@@ -108,9 +108,9 @@ status:
 	git status
 
 
-test:  
-		ls -al
-		make check
+test: Fuzzer.log TestFuzzer.tmp
+	ls -al
+	make check
 
 versions:
 	which make
