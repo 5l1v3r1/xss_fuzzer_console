@@ -62,7 +62,7 @@ def parse_html(target, data, depth):
             if name:
                 value = value + '?' + name + '=abc'
         links.update({value : depth})
-        print value
+        #print value
     return links
 
 
@@ -106,7 +106,7 @@ def scrape_links(url, depth):
     
     # Parse html response
     links = parse_html(url, data, depth-1)
-    print len(links)
+    #print len(links)
     return (links, data) # links in the data + the data itself 
 
 # Connect to a url and return the data
