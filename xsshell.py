@@ -156,7 +156,13 @@ def eval(input):
             print (color('Parameterized Links: ', 'BLUE')
                     + str(len(queue.param_atk)))
         print '=======================\n'
-
+    elif args[0] == 'show':
+        if queue != None:
+            print 'Visited: '
+            for url in queue.visited_links:
+                print url
+            for url in queue.dict_queue.keys():
+                print url
        
 
 def print_help():

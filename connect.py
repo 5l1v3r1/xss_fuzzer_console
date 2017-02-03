@@ -41,12 +41,16 @@ def parse_html(target, data, depth):
                 value = scheme + '://' + base_url + value
         if valid:
             links.update({value : depth})
-            
+
     # Parse all forms 
     for form in soup.find_all('form'):
         value = scheme + '://' + base_url + base_path 
-        if form.get('method') != 'GET': # Only parse GET requests
-            continue;
+        #if form.get('method') != 'GET': # Only parse GET requests
+        #    continue;
+        
+        action = form.get('action')
+        if action:
+            value = value + action
 
         inputs = form.find_all('input') # List of inputs for form
         if not inputs:
@@ -58,6 +62,7 @@ def parse_html(target, data, depth):
             if name:
                 value = value + '?' + name + '=abc'
         links.update({value : depth})
+        print value
     return links
 
 

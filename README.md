@@ -25,6 +25,7 @@ Handle multiple simultaneous attack sessions (run multiple fuzzers and spiders s
 
 ###Medium 
 Add Options to Scan Robots.txt<br>
+Handle reflections where app uses data following the anchor (#)
 Check for /sitemap.html or /sitemap.xml for spider<br>
 Handle JS reflect context<br>
 Handle unique attribute reflect content<br>
