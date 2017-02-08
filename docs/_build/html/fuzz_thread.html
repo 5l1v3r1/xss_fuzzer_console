@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fuzz_thread module &#8212; XSS Shell 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-fuzz_thread">
+<span id="fuzz-thread-module"></span><h1>fuzz_thread module<a class="headerlink" href="#module-fuzz_thread" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="fuzz_thread.DictQueue">
+<em class="property">class </em><code class="descclassname">fuzz_thread.</code><code class="descname">DictQueue</code><span class="sig-paren">(</span><em>link</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="fuzz_thread.DictQueue.add_attack_object">
+<code class="descname">add_attack_object</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue.add_attack_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuzz_thread.DictQueue.add_attack_objects">
+<code class="descname">add_attack_objects</code><span class="sig-paren">(</span><em>objects</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue.add_attack_objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuzz_thread.DictQueue.add_links">
+<code class="descname">add_links</code><span class="sig-paren">(</span><em>links</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue.add_links" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.attack_running">
+<code class="descname">attack_running</code><em class="property"> = True</em><a class="headerlink" href="#fuzz_thread.DictQueue.attack_running" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.cv">
+<code class="descname">cv</code><em class="property"> = &lt;Condition(&lt;_RLock owner=None count=0&gt;, 0)&gt;</em><a class="headerlink" href="#fuzz_thread.DictQueue.cv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.cv_atk">
+<code class="descname">cv_atk</code><em class="property"> = &lt;Condition(&lt;_RLock owner=None count=0&gt;, 0)&gt;</em><a class="headerlink" href="#fuzz_thread.DictQueue.cv_atk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.delay">
+<code class="descname">delay</code><em class="property"> = 0</em><a class="headerlink" href="#fuzz_thread.DictQueue.delay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuzz_thread.DictQueue.delay_conn">
+<code class="descname">delay_conn</code><span class="sig-paren">(</span><em>link</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue.delay_conn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuzz_thread.DictQueue.delay_conn_data">
+<code class="descname">delay_conn_data</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue.delay_conn_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.dict_queue">
+<code class="descname">dict_queue</code><em class="property"> = {}</em><a class="headerlink" href="#fuzz_thread.DictQueue.dict_queue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuzz_thread.DictQueue.get_attack_obj">
+<code class="descname">get_attack_obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue.get_attack_obj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuzz_thread.DictQueue.get_link">
+<code class="descname">get_link</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.DictQueue.get_link" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.param_atk">
+<code class="descname">param_atk</code><em class="property"> = []</em><a class="headerlink" href="#fuzz_thread.DictQueue.param_atk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.param_links">
+<code class="descname">param_links</code><em class="property"> = set([])</em><a class="headerlink" href="#fuzz_thread.DictQueue.param_links" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.queue_size">
+<code class="descname">queue_size</code><em class="property"> = 0</em><a class="headerlink" href="#fuzz_thread.DictQueue.queue_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.spider_running">
+<code class="descname">spider_running</code><em class="property"> = True</em><a class="headerlink" href="#fuzz_thread.DictQueue.spider_running" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.timer_lock">
+<code class="descname">timer_lock</code><em class="property"> = &lt;thread.lock object&gt;</em><a class="headerlink" href="#fuzz_thread.DictQueue.timer_lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuzz_thread.DictQueue.visited_links">
+<code class="descname">visited_links</code><em class="property"> = {}</em><a class="headerlink" href="#fuzz_thread.DictQueue.visited_links" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fuzz_thread.attack_thread">
+<code class="descclassname">fuzz_thread.</code><code class="descname">attack_thread</code><span class="sig-paren">(</span><em>queue</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.attack_thread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fuzz_thread.spider_thread">
+<code class="descclassname">fuzz_thread.</code><code class="descname">spider_thread</code><span class="sig-paren">(</span><em>queue</em><span class="sig-paren">)</span><a class="headerlink" href="#fuzz_thread.spider_thread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/fuzz_thread.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Ty Trusty.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/fuzz_thread.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

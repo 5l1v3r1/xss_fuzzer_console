@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>attack module &#8212; XSS Shell 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-attack">
+<span id="attack-module"></span><h1>attack module<a class="headerlink" href="#module-attack" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="attack.AttackContext">
+<em class="property">class </em><code class="descclassname">attack.</code><code class="descname">AttackContext</code><span class="sig-paren">(</span><em>parent</em>, <em>pos</em><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackContext" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="attack.AttackContext.attack_str">
+<code class="descname">attack_str</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackContext.attack_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>f - filter avoidance list
+Value is a tuple of (attack_char, passed_filter ) where passed
+filter means that it successfuly reflected onto the page</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.data">
+<code class="descname">data</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackContext.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.delimiter">
+<code class="descname">delimiter</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackContext.delimiter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.depth">
+<code class="descname">depth</code><em class="property"> = 0</em><a class="headerlink" href="#attack.AttackContext.depth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.f">
+<code class="descname">f</code><em class="property"> = []</em><a class="headerlink" href="#attack.AttackContext.f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackContext.fuzz_context">
+<code class="descname">fuzz_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackContext.fuzz_context" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.fuzz_payload">
+<code class="descname">fuzz_payload</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackContext.fuzz_payload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.fuzz_str">
+<code class="descname">fuzz_str</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackContext.fuzz_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.in_value">
+<code class="descname">in_value</code><em class="property"> = True</em><a class="headerlink" href="#attack.AttackContext.in_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.is_js">
+<code class="descname">is_js</code><em class="property"> = False</em><a class="headerlink" href="#attack.AttackContext.is_js" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.key">
+<code class="descname">key</code><em class="property"> = 'zxz'</em><a class="headerlink" href="#attack.AttackContext.key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.local_html">
+<code class="descname">local_html</code><em class="property"> = None</em><a class="headerlink" href="#attack.AttackContext.local_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackContext.make_atk_str">
+<code class="descname">make_atk_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackContext.make_atk_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackContext.make_fuzz_str">
+<code class="descname">make_fuzz_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackContext.make_fuzz_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.parent">
+<code class="descname">parent</code><em class="property"> = None</em><a class="headerlink" href="#attack.AttackContext.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackContext.set_tag">
+<code class="descname">set_tag</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackContext.set_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackContext.set_target_chars">
+<code class="descname">set_target_chars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackContext.set_target_chars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.tag">
+<code class="descname">tag</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackContext.tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackContext.tag_closed">
+<code class="descname">tag_closed</code><em class="property"> = False</em><a class="headerlink" href="#attack.AttackContext.tag_closed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="attack.AttackURL">
+<em class="property">class </em><code class="descclassname">attack.</code><code class="descname">AttackURL</code><span class="sig-paren">(</span><em>queue</em>, <em>parsed_url</em>, <em>url</em>, <em>param</em><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackURL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="attack.AttackURL.atk_contexts">
+<code class="descname">atk_contexts</code><em class="property"> = []</em><a class="headerlink" href="#attack.AttackURL.atk_contexts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.atk_str">
+<code class="descname">atk_str</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackURL.atk_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackURL.attack">
+<code class="descname">attack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackURL.attack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.attempt_cnt">
+<code class="descname">attempt_cnt</code><em class="property"> = 0</em><a class="headerlink" href="#attack.AttackURL.attempt_cnt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.cookie">
+<code class="descname">cookie</code><em class="property"> = 'de45'</em><a class="headerlink" href="#attack.AttackURL.cookie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="attack.AttackURL.create">
+<em class="property">static </em><code class="descname">create</code><span class="sig-paren">(</span><em>queue</em>, <em>parsed_url</em>, <em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackURL.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.data">
+<code class="descname">data</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackURL.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackURL.init_context">
+<code class="descname">init_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackURL.init_context" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.lock">
+<code class="descname">lock</code><em class="property"> = &lt;thread.lock object&gt;</em><a class="headerlink" href="#attack.AttackURL.lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.param">
+<code class="descname">param</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackURL.param" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.parsed_url">
+<code class="descname">parsed_url</code><em class="property"> = None</em><a class="headerlink" href="#attack.AttackURL.parsed_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.queue">
+<code class="descname">queue</code><em class="property"> = None</em><a class="headerlink" href="#attack.AttackURL.queue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="attack.AttackURL.set_data">
+<code class="descname">set_data</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#attack.AttackURL.set_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.url">
+<code class="descname">url</code><em class="property"> = ''</em><a class="headerlink" href="#attack.AttackURL.url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="attack.AttackURL.visited">
+<code class="descname">visited</code><em class="property"> = False</em><a class="headerlink" href="#attack.AttackURL.visited" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="attack.gen_urls">
+<code class="descclassname">attack.</code><code class="descname">gen_urls</code><span class="sig-paren">(</span><em>p</em>, <em>value</em>, <em>target_param=''</em><span class="sig-paren">)</span><a class="headerlink" href="#attack.gen_urls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/attack.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Ty Trusty.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/attack.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
