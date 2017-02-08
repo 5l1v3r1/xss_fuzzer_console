@@ -1,0 +1,7 @@
+__pycache__
+.coverage
+.DS_Store
+.pylintrc
+*.pyc
+RunFuzzer.tmp
+TestFuzzer.tmp

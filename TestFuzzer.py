@@ -20,7 +20,7 @@ class TestUM(unittest.TestCase):
 
     # Test scraper parsing ability
     def test_scrape_2(self):
-        data = open('test_html/wiki.html').read()
+        data = open('test_html/wiki.dat').read()
         url = 'https://en.wikipedia.org/wiki/George_Frideric_Handel'
         link_cnt = 861 
         length = len(parse_html(url, data, 10))
@@ -28,7 +28,7 @@ class TestUM(unittest.TestCase):
 
     # Test queue class, and see if discovering paramaterized urls
     def test_queue(self):
-        data = open('test_html/wiki.html').read()
+        data = open('test_html/wiki.dat').read()
         url = 'https://en.wikipedia.org/wiki/George_Frideric_Handel'
         links = parse_html(url, data, 10)
         queue = fuzz_thread.DictQueue({url: 5})
