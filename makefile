@@ -6,7 +6,6 @@ FILES :=            \
 	fuzz_thread.py 	\
 	intro.py		\
  	README.md 		\
-	thread.py 		\
 	TestFuzzer.py   \
 	util.py 		\
 	xsshell.py
@@ -58,7 +57,7 @@ Fuzzer.log:
 .PHONY: TestFuzzer.tmp
 TestFuzzer.tmp: .pylintrc
 	-$(PYLINT) TestFuzzer.py
-	-$(COVERAGE) run    --branch TestFuzzer.py >  TestFuzzer.tmp 2>&1
+	-$(COVERAGE) run    --branch TestFuzzer.py -v >  TestFuzzer.tmp 2>&1
 	-$(COVERAGE) report -m                     >> TestFuzzer.tmp
 	cat TestFuzzer.tmp
 

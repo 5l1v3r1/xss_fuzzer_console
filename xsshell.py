@@ -148,10 +148,10 @@ def eval(input):
     # Command to print out status of current config values
     elif args[0] == 'status':
         print '\n=== ' + color('Spider settings', 'YELLW') + ' ==='
-        print color('Target:  ', 'RED') + config.get('-target')
-        print color('Threads: ', 'RED') + str(config.get('-threads'))
-        print color('Depth:   ', 'RED') + str(config.get('-depth'))
-        print color('Delay:   ', 'RED') + str(config.get('-delay'))
+        print color('Target:    ', 'RED') + config.get('-target')
+        print color('Threads:   ', 'RED') + str(config.get('-threads'))
+        print color('Depth:     ', 'RED') + str(config.get('-depth'))
+        print color('Delay(ms): ', 'RED') + str(config.get('-delay'))
         if queue != None:
             print (color('Links Visited: ', 'BLUE')
                    + str(len(queue.visited_links)))

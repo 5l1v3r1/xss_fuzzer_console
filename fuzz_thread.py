@@ -11,8 +11,6 @@ import sys
 import re
 
 # Synchronized Ordered Dictionary that serves as a queue
-
-
 class DictQueue:
     attack_running = True  # Should attacking threads continue
     spider_running = True  # Should spider threads continue
@@ -133,8 +131,6 @@ class DictQueue:
         return connect.get_data(url)
 
 # Function executed by spider threads
-
-
 def spider_thread(queue):
     while queue.spider_running:
         # Retrieve URL and make connection
@@ -146,17 +142,10 @@ def spider_thread(queue):
         link_dict = response[0]
         data = response[1]
 
-        # Storing data in attack object if visited parameterized url
-        # param_obj = queue.param_links.get(link[0])
-        # if param_obj != None:
-        #    param_obj.set_data(data)
-        #    param_obj.init_context()
         # Adding discovered links to queue
         queue.add_links(link_dict)
 
 # Function executed by attack threads
-
-
 def attack_thread(queue):
     print 'attack thread'
     if queue == None:
