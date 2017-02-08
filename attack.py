@@ -45,7 +45,6 @@ class AttackContext:
     # Initialize class variables and parse current context
     def __init__(self, parent, pos):
         self.parent = parent
-        # self.key = gen_key()
         d = 0  # Distance from initial pos
 
         for i in reversed(parent.data[0:pos]):
@@ -136,7 +135,7 @@ class AttackContext:
             open_br + slash + script + close_br
         ret = gen_urls(self.parent.parsed_url, alert,
                        self.parent.param)
-        print ret[0][0]
+        self.attack_str = ret[0][0] 
 
     # Fuzz the context using the fuzzer string
     def fuzz_context(self):
@@ -170,7 +169,7 @@ class AttackContext:
             print self.fuzz_str
             print self.parent.url
             return False  # for now
-        print ' ----------- '
+        #print ' ----------- '
         reflect_cnt = 0
         # Check reflection success and apply input modification
         for i, val in enumerate(reflected):
@@ -178,7 +177,7 @@ class AttackContext:
             if not self.f[i][2]:
                 # If reflection matches target character
                 if val == self.f[i][0] or val == quote_plus(self.f[i][0]):
-                    print 'match ' + val
+                    #print 'match ' + val
                     self.f[i][2] = True  # Val successfully reflected
                     reflect_cnt += 1
                 else:
@@ -187,10 +186,12 @@ class AttackContext:
             else:
                 reflect_cnt += 1
 
+        
         if reflect_cnt == len(self.f):
             self.make_atk_str()
+            return False, self.attack_str
 
-        return True  # Context will not be deleted
+        return True, self.attack_str  # Context will not be deleted
 
 # Class containing Attack URLs with their associated metadata
 
@@ -206,6 +207,7 @@ class AttackURL:
     data = ''               # html data
     param = ''              # Param modified for the current url
     atk_contexts = list()   # list of AttackContext objects
+    atk_str = ''
     # Necessary to have a list of attack points because an input may be
     # reflected at multiple points in the response, and each may be subject
     # to different filtering methods.
@@ -261,21 +263,18 @@ class AttackURL:
                 return False
         new_list = []
         for context in self.atk_contexts:
-            if context.fuzz_context():  # Context fuzzed properly readd it
+            fuzz = context.fuzz_context()
+            if fuzz[0]:  # Context fuzzed properly readd it
                 new_list.append(context)
-            # TODO return true or false if need to remove from atk_contexts
+            else: 
+                self.atk_str = fuzz[1]
+                return False # Done
         self.atk_contexts = new_list
         self.attempt_cnt += 1  # Increment attempt number
         if self.atk_contexts:
             return True  # True if attackURL should remain on attack list
         else:
-            return False  # AttackURL failed
-
-# Generate random two character key
-
-
-def gen_key():
-    return ''.join(random.choice(string.ascii_uppercase) for _ in range(3))
+            return False  # AttackURL failed 
 
 # Generate URL(s) with custom query value
 # Returns a list of tuple pairs containing url and the parameter changed

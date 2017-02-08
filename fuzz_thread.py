@@ -157,3 +157,5 @@ def attack_thread(queue):
         success = obj.attack()
         if success:  # Add back to queue
             queue.add_attack_object(obj)
+        else:
+            print 'Attack String: ' + obj.atk_str
