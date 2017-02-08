@@ -8,6 +8,7 @@ import unittest
 import fuzz_thread
 from connect import set_target, scrape_links, parse_html
 
+
 class TestUM(unittest.TestCase):
 
     def setUp(self):

@@ -26,6 +26,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="fuzz_thread module" href="fuzz_thread.html" />
+    <link rel="prev" title="attack module" href="attack.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -52,8 +54,26 @@
 <dt id="connect.parse_html">
 <code class="descclassname">connect.</code><code class="descname">parse_html</code><span class="sig-paren">(</span><em>target</em>, <em>data</em>, <em>depth</em><span class="sig-paren">)</span><a class="headerlink" href="#connect.parse_html" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to parse an html for links and forms</p>
-<p>Args:</p>
-<p>Returns:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>target</strong> (<em>string url</em>) &#8211; Target URL to set the scope for parsing</li>
+<li><strong>data</strong> (<em>string html data</em>) &#8211; HTML data to parse</li>
+<li><strong>depth</strong> &#8211; Within the scope, depth limits how many 
+extra paths can be taken</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">links dict with structure {url : depth}</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string, int</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -84,6 +104,10 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">Fuzzer</a><ul>
+      <li>Previous: <a href="attack.html" title="previous chapter">attack module</a></li>
+      <li>Next: <a href="fuzz_thread.html" title="next chapter">fuzz_thread module</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>

@@ -16,9 +16,14 @@ def parse_html(target, data, depth):
     """
     Method to parse an html for links and forms
 
-    Args:
-
-    Returns:
+    :param target: Target URL to set the scope for parsing
+    :param data: HTML data to parse
+    :param depth: Within the scope, depth limits how many 
+     extra paths can be taken
+    :type target: string url
+    :type data: string html data
+    :return: links dict with structure {url : depth}
+    :rtype: string, int
 
     """
 
