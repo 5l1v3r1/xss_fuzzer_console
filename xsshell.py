@@ -110,7 +110,7 @@ def eval(input):
             if config.get('-target') == '':
                 print color('No target for spider. Use ', 'BLUE') + color('set -target <url> ', 'BOLD')
                 return
-                
+
             print (color('Spider started. Type ', 'BLUE') +
                    color('spider stop ', 'BOLD') +
                    color('to stop the spider.', 'BLUE'))

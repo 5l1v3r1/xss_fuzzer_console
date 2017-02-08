@@ -1,15 +1,27 @@
 #!/usr/bin/env python
 
-# import modules
 import httplib
 import urllib2
 from urlparse import urlparse
 from bs4 import BeautifulSoup
 
-# Parse links from html
+"""
+Module using BeautifulSoup to establish connection
+and parse_html
+
+"""
 
 
 def parse_html(target, data, depth):
+    """
+    Method to parse an html for links and forms
+
+    Args:
+
+    Returns:
+
+    """
+
     soup = BeautifulSoup(data, 'html.parser')
     o = urlparse(target)
     scheme = o.scheme  # Http or Https
@@ -19,7 +31,7 @@ def parse_html(target, data, depth):
 
     # Parse <a> tags
     for link in soup.find_all('a'):
-        valid = False    # is url valid
+        valid = False     # is url valid
         relative = False  # is link relative url addressing
         value = link.get('href')  # link url
         if value == None:
@@ -68,8 +80,17 @@ def parse_html(target, data, depth):
     return links
 
 
-# Set attack target. Make connection to ensure valid target
 def set_target(request):
+    """
+    Set attack target. Makes connection to ensure that target is valid.
+
+    Args:
+        request: The target url to connect with
+
+    Returns:
+        A tuple of connection file and a string response. The connfd is file object that contains meta data to be used by the scraper. The string response indicates whether the connection was successful or an exception was caught.
+
+    """
     connfd = None
     ret = 'Success'
     try:
@@ -88,6 +109,9 @@ def set_target(request):
 
 
 def scrape_links(url, depth):
+    """
+
+    """
     target = set_target(url)
     conn = target[0]
     result = target[1]
@@ -117,20 +141,12 @@ def scrape_links(url, depth):
 
 
 def get_data(url):
+    """
+
+    """
     target = set_target(url)
     conn = target[0]
     result = target[1]
     if result != 'Success':
         return None
     return conn.read()
-
-
-# Gather our code in a main() function
-def main(url, path):
-    scrape_links(url + path, 10)
-
-if __name__ == '__main__':
-    url = 'https://resources.allsetlearning.com'
-    path = '/chinese/grammar/'
-    url = 'https://xss-game.appspot.com/level1/frame'
-    main(url, path)

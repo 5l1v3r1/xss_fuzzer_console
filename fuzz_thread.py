@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-# import modules
 from urlparse import urlparse, parse_qs, ParseResult
 from attack import AttackURL, AttackContext
 import threading
@@ -10,7 +9,10 @@ import util
 import sys
 import re
 
+
 # Synchronized Ordered Dictionary that serves as a queue
+
+
 class DictQueue:
     attack_running = True  # Should attacking threads continue
     spider_running = True  # Should spider threads continue
@@ -131,6 +133,8 @@ class DictQueue:
         return connect.get_data(url)
 
 # Function executed by spider threads
+
+
 def spider_thread(queue):
     while queue.spider_running:
         # Retrieve URL and make connection
@@ -146,6 +150,8 @@ def spider_thread(queue):
         queue.add_links(link_dict)
 
 # Function executed by attack threads
+
+
 def attack_thread(queue):
     print 'attack thread'
     if queue == None:

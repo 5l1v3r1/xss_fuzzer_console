@@ -135,7 +135,7 @@ class AttackContext:
             open_br + slash + script + close_br
         ret = gen_urls(self.parent.parsed_url, alert,
                        self.parent.param)
-        self.attack_str = ret[0][0] 
+        self.attack_str = ret[0][0]
 
     # Fuzz the context using the fuzzer string
     def fuzz_context(self):
@@ -169,7 +169,7 @@ class AttackContext:
             print self.fuzz_str
             print self.parent.url
             return False  # for now
-        #print ' ----------- '
+        # print ' ----------- '
         reflect_cnt = 0
         # Check reflection success and apply input modification
         for i, val in enumerate(reflected):
@@ -177,7 +177,7 @@ class AttackContext:
             if not self.f[i][2]:
                 # If reflection matches target character
                 if val == self.f[i][0] or val == quote_plus(self.f[i][0]):
-                    #print 'match ' + val
+                    # print 'match ' + val
                     self.f[i][2] = True  # Val successfully reflected
                     reflect_cnt += 1
                 else:
@@ -186,7 +186,6 @@ class AttackContext:
             else:
                 reflect_cnt += 1
 
-        
         if reflect_cnt == len(self.f):
             self.make_atk_str()
             return False, self.attack_str
@@ -266,15 +265,15 @@ class AttackURL:
             fuzz = context.fuzz_context()
             if fuzz[0]:  # Context fuzzed properly readd it
                 new_list.append(context)
-            else: 
+            else:
                 self.atk_str = fuzz[1]
-                return False # Done
+                return False  # Done
         self.atk_contexts = new_list
         self.attempt_cnt += 1  # Increment attempt number
         if self.atk_contexts:
             return True  # True if attackURL should remain on attack list
         else:
-            return False  # AttackURL failed 
+            return False  # AttackURL failed
 
 # Generate URL(s) with custom query value
 # Returns a list of tuple pairs containing url and the parameter changed

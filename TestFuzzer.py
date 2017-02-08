@@ -1,7 +1,12 @@
+#!/usr/bin/env python
+
+# pylint: disable = bad-whitespace
+# pylint: disable = invalid-name
+# pylint: disable = missing-docstring
+
 import unittest
 import fuzz_thread
 from connect import set_target, scrape_links, parse_html
-
 
 class TestUM(unittest.TestCase):
 
@@ -22,7 +27,7 @@ class TestUM(unittest.TestCase):
     def test_scrape_2(self):
         data = open('test_html/wiki.dat').read()
         url = 'https://en.wikipedia.org/wiki/George_Frideric_Handel'
-        link_cnt = 861 
+        link_cnt = 861
         length = len(parse_html(url, data, 10))
         self.assertEquals(link_cnt, length)
 
@@ -34,7 +39,7 @@ class TestUM(unittest.TestCase):
         queue = fuzz_thread.DictQueue({url: 5})
         queue.delay = 0
         queue.add_links(links)
-    
+
         # 30 parameterized links in the html
         self.assertEquals(len(queue.param_links), 30)
 
